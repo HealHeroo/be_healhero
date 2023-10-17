@@ -3,18 +3,23 @@ package HealHero
 import (
 	"fmt"
 	"testing"
+
+	// "github.com/HealHeroo/be_healhero/model"
+	"github.com/HealHeroo/be_healhero/module"
+	// "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestInsertUser(t *testing.T) {
 	username := "rizkyria"
 	password := "admin123"
-	hasil:=TestInsertUser(username ,password)
+	hasil := module.InsertUser(module.MongoConn, "user", username, password)
 	fmt.Println(hasil)
 }
 
+
+
 func TestGetUserFromUsername(t *testing.T) {
 	username := "rizkyria"
-	biodata:=GetUserFromUsername(username)
-	fmt.Println(biodata)
+	data := module.GetUserFromUsername(username, module.MongoConn, "user")
+	fmt.Println(data)
 }
-

@@ -3,9 +3,12 @@ package module
 import (
 	"context"
 	"fmt"
-	"github.com/HealHeroo/be_healhero/model"
-	
+	"os"
 
+	"github.com/HealHeroo/be_healhero/model"
+	"github.com/aiteung/atdb"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var MongoString string = os.Getenv("MONGOSTRING")
@@ -27,15 +30,15 @@ func InsertOneDoc(db *mongo.Database, collection string, doc interface{}) (inser
 
 func InsertUser(db *mongo.Database, col string,username string,password string) (InsertedID interface{}) {
 	var user model.User
-	user.username = username
-	user.password = password
+	user.Username = username
+	user.Password = password
 	return InsertOneDoc(db, col, user)
 }
 
 func GetUserFromUsername(username string, db *mongo.Database, col string) (user model.UserBiodata) {
 	data_profile := db.Collection(col)
 	filter := bson.M{"username": username}
-	err := data_profile.FindOne(context.TODO(), filter).Decode(&username)
+	err := data_profile.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		fmt.Printf("getUserFromUsername: %v\n", err)
 	}
@@ -45,18 +48,18 @@ func GetUserFromUsername(username string, db *mongo.Database, col string) (user 
 
 func InsertUser_Biodata(db *mongo.Database, col string,nama string,phone_number string, email string, umur int,jenis_kelamin string) (InsertedID interface{}) {
 	var userbiodata model.UserBiodata
-	userbiodata.nama = nama
-	userbiodata.phone_number = phone_number
-	userbiodata.email = email
-	userbiodata.umur = umur
-	userbiodata.jenis_kelamin = jenis_kelamin
+	userbiodata.Nama = nama
+	userbiodata.Phone_number = phone_number
+	userbiodata.Email = email
+	userbiodata.Umur = umur
+	userbiodata.Jenis_Kelamin = jenis_kelamin
 	return InsertOneDoc(db, col, userbiodata)
 }
 
 func GetUserBiodataFromEmail(email string, db *mongo.Database, col string) (userbiodata model.UserBiodata) {
 	data_profile := db.Collection(col)
 	filter := bson.M{"email": email}
-	err := data_profile.FindOne(context.TODO(), filter).Decode(&user)
+	err := data_profile.FindOne(context.TODO(), filter).Decode(&userbiodata)
 	if err != nil {
 		fmt.Printf("getUserFromEmail: %v\n", err)
 	}
@@ -64,13 +67,13 @@ func GetUserBiodataFromEmail(email string, db *mongo.Database, col string) (user
 }
 
 
-func InsertArtikel(db *mongo.Database, judul string,konten string, diterbitkan string, biodata model.User) (InsertedID interface{}) {
+func InsertArtikel(db *mongo.Database, col string, judul string,konten string, diterbitkan string, biodata model.User) (InsertedID interface{}) {
 	var artikel model.Artikel
 	artikel.Judul = judul
 	artikel.Konten = konten
 	artikel.Diterbitkan = diterbitkan
 	artikel.Biodata = biodata
-	return InsertOneDoc(db,col, Artikel)
+	return InsertOneDoc(db,col, artikel)
 }
 
 
@@ -86,8 +89,8 @@ func GetArtikelFromJudul(judul string, db *mongo.Database, col string) (artikel 
 
 func InsertAdmin(db *mongo.Database, col string, username string, password string) (InsertedID interface{}) {
 	var admin model.Admin
-	admin.username = username
-	admin.password = password
+	admin.Username = username
+	admin.Password = password
 	return InsertOneDoc(db, col, admin)
 }
 
