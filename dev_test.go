@@ -26,7 +26,9 @@ func TestGeneratePasswordHash(t *testing.T) {
 }
 func TestGeneratePrivateKeyPaseto(t *testing.T) {
 	privateKey, publicKey := watoken.GenerateKey()
+	fmt.Println("private Key")
 	fmt.Println(privateKey)
+	fmt.Println("publicKey")
 	fmt.Println(publicKey)
 	hasil, err := watoken.Encode("rizkyria", privateKey)
 	fmt.Println(hasil, err)
