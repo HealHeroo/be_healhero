@@ -1,84 +1,16 @@
-// package HealHero
-
-// import (
-// 	"fmt"
-// 	"testing"
-
-// 	"github.com/aiteung/atdb"
-// 	"github.com/whatsauth/watoken"
-// 	"go.mongodb.org/mongo-driver/bson"
-// )
-
-// // func TestUpdateGetData(t *testing.T) {
-// // 	mconn := SetConnection("MONGOSTRING", "healhero_db")
-// // 	datagedung := GetAllBangunanLineString(mconn, "healhero_db")
-// // 	fmt.Println(datagedung)
-// // }
-
-// func TestGeneratePasswordHash(t *testing.T) {
-// 	password := "cantik"
-// 	hash, _ := HashPassword(password) // ignore error for the sake of simplicity
-// 	fmt.Println("Password:", password)
-// 	fmt.Println("Hash:    ", hash)
-
-// 	match := CheckPasswordHash(password, hash)
-// 	fmt.Println("Match:   ", match)
-// }
-// func TestGeneratePrivateKeyPaseto(t *testing.T) {
-// 	privateKey, publicKey := watoken.GenerateKey()
-// 	fmt.Println("private Key")
-// 	fmt.Println(privateKey)
-// 	fmt.Println("public Key")
-// 	fmt.Println(publicKey)
-// 	hasil, err := watoken.Encode("rizkyria", privateKey)
-// 	fmt.Println(hasil, err)
-// }
-
-// func TestHashFunction(t *testing.T) {
-// 	mconn := SetConnection("MONGOSTRING", "healhero_db")
-// 	var userdata User
-// 	userdata.Username = "rizkyria"
-// 	userdata.Password = "cantik"
-
-// 	filter := bson.M{"username": userdata.Username}
-// 	res := atdb.GetOneDoc[User](mconn, "user", filter)
-// 	fmt.Println("Mongo User Result: ", res)
-// 	hash, _ := HashPassword(userdata.Password)
-// 	fmt.Println("Hash Password : ", hash)
-// 	match := CheckPasswordHash(userdata.Password, res.Password)
-// 	fmt.Println("Match:   ", match)
-
-// }
-
-// func TestIsPasswordValid(t *testing.T) {
-// 	mconn := SetConnection("MONGOSTRING", "healhero_db")
-// 	var userdata User
-// 	userdata.Username = "rizkyria"
-// 	userdata.Password = "cantik"
-
-// 	anu := IsPasswordValid(mconn, "user", userdata)
-// 	fmt.Println(anu)
-// }
-
-// func TestInsertUser(t *testing.T) {
-// 	mconn := SetConnection("MONGOSTRING", "healhero_db")
-// 	var userdata User
-// 	userdata.Username = "rizkyria"
-// 	userdata.Password = "cantik"
-
-// 	nama := InsertUser(mconn, "user", userdata)
-// 	fmt.Println(nama)
-// }
-
 package HealHero
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"testing"
 
 	"github.com/HealHeroo/be_healhero/model"
 	"github.com/HealHeroo/be_healhero/module"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/argon2"
 	// "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -124,16 +56,71 @@ func TestGetAllDoc(t *testing.T) {
 	fmt.Println(hasil)
 }
 
+func TestInsertUser(t *testing.T) {
+	var doc model.User
+	doc.Email = "admin@gmail.com"
+	password := "admin123"
+	salt := make([]byte, 16)
+	_, err := rand.Read(salt)
+	if err != nil {
+		t.Errorf("kesalahan server : salt")
+	} else {
+		hashedPassword := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
+		user := bson.M{
+			"email": doc.Email,
+			"password": hex.EncodeToString(hashedPassword),
+			"salt": hex.EncodeToString(salt),
+			"role": "admin",
+		}
+		_, err = module.InsertOneDoc(db, "user", user)
+		if err != nil {
+			t.Errorf("gagal insert")
+		} else {
+			fmt.Println("berhasil insert")
+		}
+	}
+}
+
+// func TestGetUserByAdmin(t *testing.T) {
+// 	id := "65473763d04dda3a8502b58f"
+// 	idparam, err := primitive.ObjectIDFromHex(id)
+// 	if err != nil {
+// 		t.Errorf("Error converting id to objectID: %v", err)
+// 	}
+// 	data, err := module.GetUserFromID(idparam, db)
+// 	if err != nil {
+// 		t.Errorf("Error getting document: %v", err)
+// 	} else {
+// 		if data.Role == "pengguna" {
+// 			datapengguna, err := module.GetPenggunaFromAkun(data.ID, db)
+// 			if err != nil {
+// 				t.Errorf("Error getting document: %v", err)
+// 			} else {
+// 				datapengguna.Akun = data
+// 				fmt.Println(datapengguna) 
+// 			}
+// 		}
+// 		if data.Role == "driver" {
+// 			datadriver, err := module.GetDriverFromAkun(data.ID, db)
+// 			if err != nil {
+// 				t.Errorf("Error getting document: %v", err)
+// 			} else {
+// 				datadriver.Akun = data
+// 				fmt.Println(datadriver)
+// 			}
+// 		}
+// 	}
+// }
 
 func TestSignUpPengguna(t *testing.T) {
 	var doc model.Pengguna
-	doc.NamaLengkap = "Rizkyria Hutabarat"
-	doc.TanggalLahir = "18/11/2003"
+	doc.NamaLengkap = "Marlina"
+	doc.TanggalLahir = "30/08/2003"
 	doc.JenisKelamin = "Perempuan"
-	doc.NomorHP = "081219882869"
+	doc.NomorHP = "081284739485"
 	doc.Alamat = "Jalan Sarijadi No 56"
-	doc.Akun.Email = "rizkyria@gmail.com"
-	doc.Akun.Password = "rizkyriacantik"
+	doc.Akun.Email = "marlina@gmail.com"
+	doc.Akun.Password = "marlinacantik"
 	err := module.SignUpPengguna(db, doc)
 	if err != nil {
 		t.Errorf("Error inserting document: %v", err)
@@ -172,6 +159,50 @@ func TestLogIn(t *testing.T) {
 	}
 }
 
+// func TestGeneratePrivateKeyPaseto(t *testing.T) {
+// 	privateKey, publicKey := module.GenerateKey()
+// 	fmt.Println("ini private key :", privateKey)
+// 	fmt.Println("ini public key :", publicKey)
+// 	id := "64d0b1104255ba95ba588512"
+// 	objectId, err := primitive.ObjectIDFromHex(id)
+// 	role := "admin"
+// 	if err != nil{
+// 		t.Fatalf("error converting id to objectID: %v", err)
+// 	}
+// 	hasil, err := module.Encode(objectId, role, privateKey)
+// 	fmt.Println("ini hasil :", hasil, err)
+// }
+
+func TestUpdatePengguna(t *testing.T) {
+	var doc model.Pengguna
+	id := "655321e67e3a83deec456409"
+	objectId, _ := primitive.ObjectIDFromHex(id)
+	id2 := "655321e57e3a83deec456407"
+	userid, _ := primitive.ObjectIDFromHex(id2)
+	doc.NamaLengkap = "Marlina Lubis"
+	doc.TanggalLahir = "30/08/2003"
+	doc.JenisKelamin = "Perempuan"
+	doc.NomorHP = "081237629321"
+	doc.Alamat = "Jalan Sarijadi No 59"
+	if doc.NamaLengkap == "" || doc.TanggalLahir == "" || doc.JenisKelamin == "" || doc.NomorHP == "" || doc.Alamat == "" {
+		t.Errorf("mohon untuk melengkapi data")
+	} else {
+		err := module.UpdatePengguna(objectId, userid, db, doc)
+		if err != nil {
+			t.Errorf("Error inserting document: %v", err)
+			fmt.Println("Data tidak berhasil diupdate")
+		} else {
+			fmt.Println("Data berhasil diupdate")
+		}
+	}
+}
+
+// func TestWatoken(t *testing.T) {
+// 	body, err := module.Decode("f3248b509d9731ebd4e0ccddadb5a08742e083db01678e8a1d734ce81298868f", "v4.public.eyJlbWFpbCI6ImZheEBnbWFpbC5jb20iLCJleHAiOiIyMDIzLTEwLTIyVDAwOjQxOjQ1KzA3OjAwIiwiZmlyc3RuYW1lIjoiRmF0d2EiLCJpYXQiOiIyMDIzLTEwLTIxVDIyOjQxOjQ1KzA3OjAwIiwiaWQiOiI2NDkwNjNkM2FkNzJlMDc0Mjg2YzYxZTgiLCJsYXN0bmFtZSI6IkZhdGFoaWxsYWgiLCJuYmYiOiIyMDIzLTEwLTIxVDIyOjQxOjQ1KzA3OjAwIiwicm9sZSI6InBlbGFtYXIifR_Q4b9X7WC7up7dUUxz_Yki39M-ReovTIoTFfdJmFYRF5Oer0zQZx_ZQamkOsogJ6RuGJhxT3OxrXFS5p6dMg0")
+// 	fmt.Println("isi : ", body, err)
+// }
+
+
 func TestInsertOneOrder(t *testing.T) {
 	var doc model.Order
 	doc.NamaObat= "Amoxsilin"
@@ -190,43 +221,6 @@ func TestInsertOneOrder(t *testing.T) {
 	   }
    }
 }
-
-
-// func TestGeneratePrivateKeyPaseto(t *testing.T) {
-// 	privateKey, publicKey := module.GenerateKey()
-// 	fmt.Println("ini private key :", privateKey)
-// 	fmt.Println("ini public key :", publicKey)
-// 	id := "64d0b1104255ba95ba588512"
-// 	objectId, err := primitive.ObjectIDFromHex(id)
-// 	role := "admin"
-// 	if err != nil{
-// 		t.Fatalf("error converting id to objectID: %v", err)
-// 	}
-// 	hasil, err := module.Encode(objectId, role, privateKey)
-// 	fmt.Println("ini hasil :", hasil, err)
-// }
-
-// func TestWatoken(t *testing.T) {
-// 	body, err := module.Decode("f3248b509d9731ebd4e0ccddadb5a08742e083db01678e8a1d734ce81298868f", "v4.public.eyJlbWFpbCI6ImZheEBnbWFpbC5jb20iLCJleHAiOiIyMDIzLTEwLTIyVDAwOjQxOjQ1KzA3OjAwIiwiZmlyc3RuYW1lIjoiRmF0d2EiLCJpYXQiOiIyMDIzLTEwLTIxVDIyOjQxOjQ1KzA3OjAwIiwiaWQiOiI2NDkwNjNkM2FkNzJlMDc0Mjg2YzYxZTgiLCJsYXN0bmFtZSI6IkZhdGFoaWxsYWgiLCJuYmYiOiIyMDIzLTEwLTIxVDIyOjQxOjQ1KzA3OjAwIiwicm9sZSI6InBlbGFtYXIifR_Q4b9X7WC7up7dUUxz_Yki39M-ReovTIoTFfdJmFYRF5Oer0zQZx_ZQamkOsogJ6RuGJhxT3OxrXFS5p6dMg0")
-// 	fmt.Println("isi : ", body, err)
-// }
-
-// <<<<<<< HEAD
-// =======
-// 	match := CheckPasswordHash(password, hash)
-// 	fmt.Println("Match:   ", match)
-// }
-// func TestGeneratePrivateKeyPaseto(t *testing.T) {
-// 	privateKey, publicKey := watoken.GenerateKey()
-// 	fmt.Println("private Key")
-// 	fmt.Println(privateKey)
-// 	fmt.Println("publicKey")
-// 	fmt.Println(publicKey)
-// 	hasil, err := watoken.Encode("rizkyria", privateKey)
-// 	fmt.Println(hasil, err)
-// }
-// >>>>>>> d4d8e3c7ef4ba1e17afe1ad98d8cc294de290774
-
 
 // // test obat
 // func TestInsertObat(t *testing.T) {
@@ -327,3 +321,15 @@ func TestInsertOneOrder(t *testing.T) {
 // 	}
 // }
 
+func TestReturnStruct(t *testing.T){
+	id := "654a20b1c670b510212f817e"
+	objectId, _ := primitive.ObjectIDFromHex(id)
+	user, _ := module.GetUserFromID(objectId, db)
+	data := model.User{ 
+		ID : user.ID,
+		Email: user.Email,
+		Role : user.Role,
+	}
+	hasil := module.GCFReturnStruct(data)
+	fmt.Println(hasil)
+}

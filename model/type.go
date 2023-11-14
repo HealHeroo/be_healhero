@@ -34,6 +34,11 @@ type User struct {
 	Role     string            `bson:"role" json:"role"`
 }
 
+type Password struct {
+	Password        string         	   `bson:"password,omitempty" json:"password,omitempty"`
+	Newpassword 	string         	   `bson:"newpass,omitempty" json:"newpass,omitempty"`
+}
+
 type Pengguna struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	NamaLengkap  	string             `bson:"namalengkap,omitempty" json:"namalengkap,omitempty"`

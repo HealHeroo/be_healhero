@@ -191,14 +191,14 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 	objectId := primitive.NewObjectID()
 	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
-		return fmt.Errorf("Dimohon untuk melengkapi data")
+		return fmt.Errorf("dimohon untuk melengkapi data")
 	} 
 	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
-		return fmt.Errorf("Email tidak valid")
+		return fmt.Errorf("email tidak valid")
 	} 
 	userExists, _ := GetUserFromEmail(insertedDoc.Akun.Email, db)
 	if insertedDoc.Akun.Email == userExists.Email {
-		return fmt.Errorf("Email sudah terdaftar")
+		return fmt.Errorf("email sudah terdaftar")
 	} 
 	if strings.Contains(insertedDoc.Akun.Password, " ") {
 		return fmt.Errorf("password tidak boleh mengandung spasi")
@@ -264,20 +264,126 @@ func LogIn(db *mongo.Database, insertedDoc model.User) (user model.User, err err
 }
 
 //user
+func UpdateEmailUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.User) error {
+	dataUser, err := GetUserFromID(iduser, db)
+	if err != nil {
+		return err
+	}
+	if insertedDoc.Email == "" {
+		return fmt.Errorf("mohon untuk melengkapi data")
+	}
+	if err = checkmail.ValidateFormat(insertedDoc.Email); err != nil {
+		return fmt.Errorf("email tidak valid")
+	}
+	existsDoc, _ := GetUserFromEmail(insertedDoc.Email, db)
+	if existsDoc.Email == insertedDoc.Email {
+		return fmt.Errorf("email sudah terdaftar")
+	}
+	user := bson.M{
+		"email": insertedDoc.Email,
+		"password": dataUser.Password,
+		"salt": dataUser.Salt,
+		"role": dataUser.Role,
+	}
+	err = UpdateOneDoc(iduser, db, "user", user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// func UpdateUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.User) error {
+// 	dataUser, err := GetUserFromID(iduser, db)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if insertedDoc.Email == "" || insertedDoc.Password == "" {
+// 		return fmt.Errorf("Dimohon untuk melengkapi data")
+// 	}
+// 	if err = checkmail.ValidateFormat(insertedDoc.Email); err != nil {
+// 		return fmt.Errorf("Email tidak valid")
+// 	}
+// 	existsDoc, _ := GetUserFromEmail(insertedDoc.Email, db)
+// 	if existsDoc.Email == insertedDoc.Email {
+// 		return fmt.Errorf("Email sudah terdaftar")
+// 	}
+// 	if strings.Contains(insertedDoc.Password, " ") {
+// 		return fmt.Errorf("password tidak boleh mengandung spasi")
+// 	}
+// 	if len(insertedDoc.Password) < 8 {
+// 		return fmt.Errorf("password terlalu pendek")
+// 	}
+// 	salt := make([]byte, 16)
+// 	_, err = rand.Read(salt)
+// 	if err != nil {
+// 		return fmt.Errorf("kesalahan server : salt")
+// 	}
+// 	hashedPassword := argon2.IDKey([]byte(insertedDoc.Password), salt, 1, 64*1024, 4, 32)
+// 	user := bson.M{
+// 		"email": insertedDoc.Email,
+// 		"password": hex.EncodeToString(hashedPassword),
+// 		"salt": hex.EncodeToString(salt),
+// 		"role": dataUser.Role,
+// 	}
+// 	err = UpdateOneDoc(iduser, db, "user", user)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+func UpdatePasswordUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Password) error {
+	dataUser, err := GetUserFromID(iduser, db)
+	if err != nil {
+		return err
+	}
+	salt, err := hex.DecodeString(dataUser.Salt)
+	if err != nil {
+		return fmt.Errorf("kesalahan server : salt")
+	}
+	hash := argon2.IDKey([]byte(insertedDoc.Password), salt, 1, 64*1024, 4, 32)
+	if hex.EncodeToString(hash) != dataUser.Password {
+		return fmt.Errorf("password lama salah")
+	}
+	if strings.Contains(insertedDoc.Newpassword, " ") {
+		return fmt.Errorf("password tidak boleh mengandung spasi")
+	}
+	if len(insertedDoc.Newpassword) < 8 {
+		return fmt.Errorf("password terlalu pendek")
+	}
+	salt = make([]byte, 16)
+	_, err = rand.Read(salt)
+	if err != nil {
+		return fmt.Errorf("kesalahan server : salt")
+	}
+	hashedPassword := argon2.IDKey([]byte(insertedDoc.Newpassword), salt, 1, 64*1024, 4, 32)
+	user := bson.M{
+		"email": dataUser.Email,
+		"password": hex.EncodeToString(hashedPassword),
+		"salt": hex.EncodeToString(salt),
+		"role": dataUser.Role,
+	}
+	err = UpdateOneDoc(iduser, db, "user", user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func UpdateUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.User) error {
 	dataUser, err := GetUserFromID(iduser, db)
 	if err != nil {
 		return err
 	}
 	if insertedDoc.Email == "" || insertedDoc.Password == "" {
-		return fmt.Errorf("Dimohon untuk melengkapi data")
+		return fmt.Errorf("mohon untuk melengkapi data")
 	}
 	if err = checkmail.ValidateFormat(insertedDoc.Email); err != nil {
-		return fmt.Errorf("Email tidak valid")
+		return fmt.Errorf("email tidak valid")
 	}
 	existsDoc, _ := GetUserFromEmail(insertedDoc.Email, db)
 	if existsDoc.Email == insertedDoc.Email {
-		return fmt.Errorf("Email sudah terdaftar")
+		return fmt.Errorf("email sudah terdaftar")
 	}
 	if strings.Contains(insertedDoc.Password, " ") {
 		return fmt.Errorf("password tidak boleh mengandung spasi")
@@ -353,7 +459,7 @@ func UpdatePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database, inse
 	if pengguna.ID != idparam {
 		return fmt.Errorf("anda bukan pemilik data ini")
 	}
-	if insertedDoc.NamaLengkap == "" || insertedDoc.TanggalLahir == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
+	if insertedDoc.NamaLengkap == "" || insertedDoc.TanggalLahir == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == ""{
 		return fmt.Errorf("Dimohon untuk melengkapi data")
 	} 
 	pgn := bson.M{
@@ -406,7 +512,7 @@ func GetPenggunaFromAkun(akun primitive.ObjectID, db *mongo.Database) (doc model
 	err = collection.FindOne(context.TODO(), filter).Decode(&doc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return doc, fmt.Errorf("Pengguna tidak ditemukan")
+			return doc, fmt.Errorf("pengguna tidak ditemukan")
 		}
 		return doc, fmt.Errorf("kesalahan server")
 	}
@@ -422,8 +528,8 @@ func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insert
 	if driver.ID != idparam {
 		return fmt.Errorf("anda bukan pemilik data ini")
 	}
-	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
-		return fmt.Errorf("Dimohon untuk melengkapi data")
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == ""{
+		return fmt.Errorf("dimohon untuk melengkapi data")
 	} 
 	drv := bson.M{
 		"namalengkap": insertedDoc.NamaLengkap,
@@ -502,24 +608,6 @@ func InsertObat(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model
 	}
 	return nil
 }
-
-
-// func InsertObat(idparam, iduser primitive.ObjectID, db *mongo.Database, obat model.Obat) error {
-// 	obt := bson.M{
-		
-// 		"nama_obat":  obat.NamaObat,
-// 		"jenis_obat": obat.JenisObat,
-// 		"keterangan": obat.Keterangan,
-// 		"harga":      obat.Harga,
-		
-// 	}
-
-// 	collection := db.Collection("obat")
-// 	_, err := collection.InsertOne(context.TODO(), obt)
-// 	return err
-// }
-
-
 
 func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Obat) error {
 	_, err := GetObatFromID(idparam, db)
