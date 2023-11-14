@@ -211,6 +211,21 @@ func TestInsertOneOrder(t *testing.T) {
 // 	fmt.Println("isi : ", body, err)
 // }
 
+<<<<<<< HEAD
+=======
+	match := CheckPasswordHash(password, hash)
+	fmt.Println("Match:   ", match)
+}
+func TestGeneratePrivateKeyPaseto(t *testing.T) {
+	privateKey, publicKey := watoken.GenerateKey()
+	fmt.Println("private Key")
+	fmt.Println(privateKey)
+	fmt.Println("publicKey")
+	fmt.Println(publicKey)
+	hasil, err := watoken.Encode("rizkyria", privateKey)
+	fmt.Println(hasil, err)
+}
+>>>>>>> d4d8e3c7ef4ba1e17afe1ad98d8cc294de290774
 
 
 // // test obat
