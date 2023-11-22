@@ -190,7 +190,7 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 
 func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 	objectId := primitive.NewObjectID()
-	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" ||  insertedDoc.JenisMotor == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" ||  insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
 		return fmt.Errorf("dimohon untuk melengkapi data")
 	} 
 	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
@@ -225,7 +225,6 @@ func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 		"nomorhp": insertedDoc.NomorHP,
 		"alamat": insertedDoc.Alamat,
 		"platmotor": insertedDoc.PlatMotor,
-		"jenismotor": insertedDoc.JenisMotor,
 		"akun": model.User {
 			ID : objectId,
 		},
@@ -529,7 +528,7 @@ func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insert
 	if driver.ID != idparam {
 		return fmt.Errorf("anda bukan pemilik data ini")
 	}
-	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" || insertedDoc.JenisMotor == ""{
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == ""{
 		return fmt.Errorf("dimohon untuk melengkapi data")
 	} 
 	drv := bson.M{
@@ -538,7 +537,6 @@ func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insert
 		"nomorhp": insertedDoc.NomorHP,
 		"alamat": insertedDoc.Alamat,
 		"platmotor": insertedDoc.PlatMotor,
-		"jenismotor": insertedDoc.JenisMotor,
 		"akun": model.User {
 			ID : driver.Akun.ID,
 		},
