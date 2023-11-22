@@ -539,6 +539,32 @@ func GCFHandlerGetObatFromID(MONGOCONNSTRINGENV, dbname string, r *http.Request)
 }
 
 
+func GCFHandlerGetObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Missing ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	obat, err := GetObatFromID(idParam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	return GCFReturnStruct(obat)
+}
+
+
 //order
 func GCFHandlerInsertOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
@@ -630,6 +656,32 @@ func GCFHandlerGetOrderFromID(MONGOCONNSTRINGENV, dbname string, r *http.Request
 	}
 	return GCFReturnStruct(data)
 }
+
+func GCFHandlerGetOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Missing ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	obat, err := GetOrderFromID(idParam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	return GCFReturnStruct(obat)
+}
+
 
 
 // return struct
