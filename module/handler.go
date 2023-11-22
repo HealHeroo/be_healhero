@@ -401,7 +401,7 @@ func GCFHandlerGetDriverFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname st
 		return GCFReturnStruct(Response)
 	}
 	if payload.Role != "driver" {
-		Response.Message = "Kamu bukan driver"
+		Response.Message = "Maaf Kamu bukan driver"
 		return GCFReturnStruct(Response)
 	}
 	data, err := GetDriverFromAkun(payload.Id, conn)
