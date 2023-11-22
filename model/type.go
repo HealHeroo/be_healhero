@@ -61,7 +61,6 @@ type Driver struct {
 	NomorHP  		string             `bson:"nomorhp,omitempty" json:"nomorhp,omitempty"`
 	Alamat			string             `bson:"alamat,omitempty" json:"alamat,omitempty"`
 	PlatMotor  		string             `bson:"platmotor,omitempty" json:"platmotor,omitempty"`
-	JenisMotor  		string         `bson:"jenismotor,omitempty" json:"jenismotor,omitempty"`
 	Akun     		User           	   `bson:"akun" json:"akun"`
 }
 
