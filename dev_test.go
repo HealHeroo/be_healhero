@@ -205,9 +205,9 @@ func TestUpdatePengguna(t *testing.T) {
 
 func TestInsertOneOrder(t *testing.T) {
 	var doc model.Order
-	doc.NamaObat= "Amoxsilin"
+	doc.NamaObat= "Vometa"
    doc.Quantity= "1"
-   doc.TotalCost = "Rp 7.000"
+   doc.TotalCost = "Rp 60.000"
    doc.Status = "Pending"
    if  doc.Quantity == "" || doc.TotalCost == "" || doc.Status == ""    {
 	   t.Errorf("mohon untuk melengkapi data")
