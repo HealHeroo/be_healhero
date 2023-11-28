@@ -190,7 +190,7 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 
 func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 	objectId := primitive.NewObjectID()
-	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" ||  insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
 		return fmt.Errorf("dimohon untuk melengkapi data")
 	} 
 	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
