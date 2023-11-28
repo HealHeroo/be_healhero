@@ -46,12 +46,12 @@ type Pengguna struct {
 	JenisKelamin  	string             `bson:"jeniskelamin,omitempty" json:"jeniskelamin,omitempty"`
 	NomorHP  		string             `bson:"nomorhp,omitempty" json:"nomorhp,omitempty"`
 	Alamat			string             `bson:"alamat,omitempty" json:"alamat,omitempty"`
-	Akun     		User               `bson:"akun" json:"akun"`
+	Akun     		User               `bson:"akun,omitempty" json:"akun,omitempty"`
 }
 
 type Admin struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Akun     User            	`bson:"akun" json:"akun"`
+	Akun     User            	`bson:"akun,omitempty" json:"akun,omitempty"`
 }
 
 type Driver struct {
@@ -61,7 +61,7 @@ type Driver struct {
 	NomorHP  		string             `bson:"nomorhp,omitempty" json:"nomorhp,omitempty"`
 	Alamat			string             `bson:"alamat,omitempty" json:"alamat,omitempty"`
 	PlatMotor  		string             `bson:"platmotor,omitempty" json:"platmotor,omitempty"`
-	Akun     		User           	   `bson:"akun" json:"akun"`
+	Akun     		User           	   `bson:"akun,omitempty" json:"akun,omitempty"`
 }
 
 type Obat struct {
