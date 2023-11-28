@@ -673,8 +673,7 @@ func GCFHandlerGetOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r
 
 	id := GetID(r)
 	if id == "" {
-		Response.Message = "Missing ID parameter"
-		return GCFReturnStruct(Response)
+		return GCFHandlerGetAllOrder(MONGOCONNSTRINGENV, dbname)
 	}
 
 	idParam, err := primitive.ObjectIDFromHex(id)
