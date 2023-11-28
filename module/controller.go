@@ -675,12 +675,22 @@ func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Obat, 
 
 //order
 
-func InsertOrder(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
-	if insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.TotalCost == "" || insertedDoc.Status == ""  {
+func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
+
+	if insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.TotalCost == "" || insertedDoc.Status == "" {
 		return fmt.Errorf("harap lengkapi semua data order")
 	}
 
 	ord := bson.M{
+		"pengguna": bson.M{
+			"_id" : iduser,
+		},
+		"driver": bson.M{
+			"_id" : insertedDoc.Driver.ID,
+		},
+		"obat": bson.M{
+			"_id" : idparam,
+		},
 		"namaobat":    insertedDoc.NamaObat,
 		"quantity":    insertedDoc.Quantity,
 		"total_cost":   insertedDoc.TotalCost,

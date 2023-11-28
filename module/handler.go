@@ -581,7 +581,17 @@ func GCFHandlerInsertOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = InsertOrder(payload.Id, conn, dataorder)
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllObat(MONGOCONNSTRINGENV, dbname)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+	err = InsertOrder(idParam, payload.Id, conn, dataorder)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)

@@ -74,9 +74,9 @@ type Obat struct {
 
 type Order struct {
 	ID        	  primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	PenggunaID    primitive.ObjectID `bson:"pengguna_id" json:"pengguna_id"`
-	DriverID  	  primitive.ObjectID `bson:"driver_id" json:"driver_id"`
-	ObatID    	  primitive.ObjectID `bson:"obat_id" json:"obat_id"`
+	Pengguna    Pengguna `bson:"pengguna" json:"pengguna"`
+	Driver  	  Driver `bson:"driver" json:"driver"`
+	Obat    	  Obat `bson:"obat" json:"obat"`
 	NamaObat  	  string             `bson:"namaobat" json:"namaobat"`
 	Quantity  	  string             `bson:"quantity" json:"quantity"`
 	TotalCost 	  string           	 `bson:"total_cost" json:"total_cost"`
