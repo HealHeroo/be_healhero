@@ -583,7 +583,8 @@ func GCFHandlerInsertOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string
 	}
 	id := GetID(r)
 	if id == "" {
-		return GCFHandlerGetAllObat(MONGOCONNSTRINGENV, dbname)
+		Response.Message = "Wrong parameter"
+		return GCFReturnStruct(Response)
 	}
 
 	idParam, err := primitive.ObjectIDFromHex(id)
