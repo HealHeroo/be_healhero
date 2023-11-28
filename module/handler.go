@@ -545,8 +545,7 @@ func GCFHandlerGetObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r 
 
 	id := GetID(r)
 	if id == "" {
-		Response.Message = "Missing ID parameter"
-		return GCFReturnStruct(Response)
+		return GCFHandlerGetAllObat(MONGOCONNSTRINGENV, dbname)
 	}
 
 	idParam, err := primitive.ObjectIDFromHex(id)
