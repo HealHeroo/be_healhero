@@ -695,6 +695,28 @@ func InsertOrder(iduser primitive.ObjectID, db *mongo.Database, insertedDoc mode
 }
 
 
+//update status pengiriman
+func UpdateStatusOrder(idorder, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
+	order, err := GetOrderFromID(idorder, db)
+	if err != nil {
+		return err
+	}
+
+	data := bson.M{
+		"namaobat":    order.NamaObat,
+		"quantity":    order.Quantity,
+		"total_cost":   order.TotalCost,
+		"status": insertedDoc.Status,
+	}
+
+	err = UpdateOneDoc(idorder, db, "order", data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func DeleteOrder(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
 	_, err := GetOrderFromID(idparam, db)
 	if err != nil {
