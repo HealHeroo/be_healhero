@@ -696,7 +696,7 @@ func InsertOrder(iduser primitive.ObjectID, db *mongo.Database, insertedDoc mode
 
 
 //update status pengiriman
-func UpdateStatusOrder(idorder, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
+func UpdateStatusOrder(idorder primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
 	order, err := GetOrderFromID(idorder, db)
 	if err != nil {
 		return err
