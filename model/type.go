@@ -28,10 +28,10 @@ import (
 
 type User struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Email 	 string            `bson:"email" json:"email"`
-	Password string            `bson:"password" json:"password"`
-	Salt 	 string			   `bson:"salt,omitempty" json:"salt,omitempty"`
-	Role     string            `bson:"role" json:"role"`
+	Email 	 string            `bson:"email,omitempty" json:"email,omitempty"`
+	Password string            `bson:"password,omitempty" json:"password,omitempty"`
+	Salt 	 string			   `bson:"salt,omitempty,omitempty" json:"salt,omitempty"`
+	Role     string            `bson:"role,omitempty" json:"role,omitempty"`
 }
 
 type Password struct {
@@ -40,7 +40,7 @@ type Password struct {
 }
 
 type Pengguna struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	ID       primitive.ObjectID 		`bson:"_id,omitempty" json:"_id,omitempty"`
 	NamaLengkap  	string             `bson:"namalengkap,omitempty" json:"namalengkap,omitempty"`
 	TanggalLahir	string             `bson:"tanggallahir,omitempty" json:"tanggallahir,omitempty"`
 	JenisKelamin  	string             `bson:"jeniskelamin,omitempty" json:"jeniskelamin,omitempty"`
@@ -50,7 +50,7 @@ type Pengguna struct {
 }
 
 type Admin struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	ID       primitive.ObjectID `bson:"_id,omitempty,omitempty" json:"_id,omitempty"`
 	Akun     User            	`bson:"akun,omitempty" json:"akun,omitempty"`
 }
 
@@ -66,21 +66,21 @@ type Driver struct {
 
 type Obat struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	NamaObat    string            `json:"nama_obat" bson:"nama_obat"`
-	JenisObat   string            `json:"jenis_obat" bson:"jenis_obat"`
-	Keterangan  string            `json:"keterangan" bson:"keterangan"`
-	Harga       string           `json:"harga" bson:"harga"`
+	NamaObat    string            `json:"nama_obat,omitempty" bson:"nama_obat,omitempty"`
+	JenisObat   string            `json:"jenis_obat,omitempty" bson:"jenis_obat,omitempty"`
+	Keterangan  string            `json:"keterangan,omitempty" bson:"keterangan,omitempty"`
+	Harga       string           `json:"harga,omitempty" bson:"harga,omitempty"`
 }
 
 type Order struct {
 	ID        	  primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
-	Pengguna    Pengguna `bson:"pengguna" json:"pengguna"`
-	Driver  	  Driver `bson:"driver" json:"driver"`
-	Obat    	  Obat `bson:"obat" json:"obat"`
-	NamaObat  	  string             `bson:"namaobat" json:"namaobat"`
-	Quantity  	  string             `bson:"quantity" json:"quantity"`
-	TotalCost 	  string           	 `bson:"total_cost" json:"total_cost"`
-	Status    	  string           	 `bson:"status" json:"status"`
+	Pengguna    	Pengguna `bson:"pengguna,omitempty" json:"pengguna,omitempty"`
+	Driver  	  Driver `bson:"driver,omitempty" json:"driver,omitempty"`
+	Obat    	  Obat `bson:"obat,omitempty" json:"obat,omitempty"`
+	NamaObat  	  string             `bson:"namaobat,omitempty" json:"namaobat,omitempty"`
+	Quantity  	  string             `bson:"quantity,omitempty" json:"quantity,omitempty"`
+	TotalCost 	  string           	 `bson:"total_cost,omitempty" json:"total_cost,v"`
+	Status    	  string           	 `bson:"status,omitempty" json:"status,omitempty"`
 }
 
 type Credential struct {

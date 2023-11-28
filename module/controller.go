@@ -747,7 +747,7 @@ func GetOrderFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Order
 		if err == mongo.ErrNoDocuments {
 			return doc, fmt.Errorf("_id tidak ditemukan")
 		}
-		return doc, fmt.Errorf("kesalahan server")
+		return doc, err
 	}
 	return doc, nil
 }

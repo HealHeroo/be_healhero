@@ -321,6 +321,23 @@ func TestGetObatFromID(t *testing.T) {
 	}
 }
 
+//order
+func TestGetOrderFromID(t *testing.T) {
+	conn := module.MongoConnect("MONGOSTRING", "healhero_db")
+	id := "6565cd8f8b1e02b3244cd8a8"
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil{
+		t.Fatalf("error converting id to objectID: %v", err)
+	}
+	order, err := module.GetOrderFromID(objectId, conn)
+	if err != nil {
+		t.Errorf("Error get order : %v", err)
+	} else {
+		fmt.Println(order)
+	}
+}
+
+
 func TestReturnStruct(t *testing.T){
 	id := "655c4c1b35843ed5631c903b"
 	objectId, _ := primitive.ObjectIDFromHex(id)
@@ -333,3 +350,4 @@ func TestReturnStruct(t *testing.T){
 	hasil := module.GCFReturnStruct(data)
 	fmt.Println(hasil)
 }
+
