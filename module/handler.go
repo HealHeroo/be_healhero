@@ -525,6 +525,8 @@ func GCFHandlerGetPenggunaFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname 
 	
 }
 
+
+
 func GCFHandlerGetPenggunaByAdmin(conn *mongo.Database, r *http.Request) string {
 	Response.Status = false
 	//
@@ -644,27 +646,86 @@ func GCFHandlerGetAllDriver(MONGOCONNSTRINGENV, dbname string) string {
 	return GCFReturnStruct(data)
 }
 
+
 func GCFHandlerGetDriverFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-	var Response model.Response
 	Response.Status = false
-	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
-	if payload.Role != "driver" {
-		Response.Message = "Maaf Kamu bukan driver"
-		return GCFReturnStruct(Response)
+	if user_login.Role != "driver" {
+		return GCFHandlerGetDriverByDriver(user_login.Id, conn)
 	}
-	data, err := GetDriverFromAkun(payload.Id, conn)
-	if err != nil {
-		Response.Message = err.Error()
-		return GCFReturnStruct(Response)
+	if user_login.Role == "admin" {
+		return GCFHandlerGetDriverByAdmin(conn, r)
 	}
-	return GCFReturnStruct(data)
+	Response.Message = "Kamu tidak memiliki akses"
+	return GCFReturnStruct(Response)
+	
 }
+
+func GCFHandlerGetDriverByAdmin(conn *mongo.Database, r *http.Request) string {
+	Response.Status = false
+	//
+	id := GetID(r)
+	if id == "" {
+		pengguna, err := GetAllPenggunaByAdmin(conn)
+		if err != nil {
+			Response.Message = err.Error()
+			return GCFReturnStruct(Response)
+		}
+		return GCFReturnStruct(pengguna)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
+	}
+	pengguna, err := GetPenggunaFromIDByAdmin(idparam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	//
+	return GCFReturnStruct(pengguna)
+}
+
+func GCFHandlerGetDriverByDriver(iduser primitive.ObjectID, conn *mongo.Database) string {
+	Response.Status = false
+	//
+	pengguna, err := GetPenggunaFromAkun(iduser, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	//
+	return GCFReturnStruct(pengguna)
+}
+
+// func GCFHandlerGetDriverFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+// 	var Response model.Response
+// 	Response.Status = false
+// 	tokenstring := r.Header.Get("Authorization")
+// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	if payload.Role != "driver" {
+// 		Response.Message = "Maaf Kamu bukan driver"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	data, err := GetDriverFromAkun(payload.Id, conn)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	return GCFReturnStruct(data)
+// }
 
 // obat
 func GCFHandlerInsertObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
