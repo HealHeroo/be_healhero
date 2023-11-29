@@ -387,20 +387,50 @@ func GCFHandlerGetAllUserByAdmin(conn *mongo.Database) string {
 }
 
 // pengguna
+// func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+// 	var Response model.Response
+// 	Response.Status = false
+// 	tokenstring := r.Header.Get("Authorization")
+// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+// 	if err != nil {
+// 		Response.Message = "Gagal Decode Token : " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	if payload.Role != "pengguna" {
+// 		Response.Message = "Anda tidak memiliki akses"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	id := GetID(r)
+// 	if id == "" {
+// 		Response.Message = "Wrong parameter"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	idparam, err := primitive.ObjectIDFromHex(id)
+// 	if err != nil {
+// 		Response.Message = "Invalid id parameter"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	var datapengguna model.Pengguna
+// 	err = json.NewDecoder(r.Body).Decode(&datapengguna)
+// 	if err != nil {
+// 		Response.Message = "error parsing application/json: " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	err = UpdatePengguna(idparam, payload.Id, conn, datapengguna)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	Response.Status = true
+// 	Response.Message = "Berhasil Update Pengguna"
+// 	return GCFReturnStruct(Response)
+// }
+
 func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-	var Response model.Response
 	Response.Status = false
-	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
-	if err != nil {
-		Response.Message = "Gagal Decode Token : " + err.Error()
-		return GCFReturnStruct(Response)
-	}
-	if payload.Role != "pengguna" {
-		Response.Message = "Anda tidak memiliki akses"
-		return GCFReturnStruct(Response)
-	}
+	//
 	id := GetID(r)
 	if id == "" {
 		Response.Message = "Wrong parameter"
@@ -411,21 +441,39 @@ func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname str
 		Response.Message = "Invalid id parameter"
 		return GCFReturnStruct(Response)
 	}
-	var datapengguna model.Pengguna
-	err = json.NewDecoder(r.Body).Decode(&datapengguna)
+	err = json.NewDecoder(r.Body).Decode(&pengguna)
 	if err != nil {
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = UpdatePengguna(idparam, payload.Id, conn, datapengguna)
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+	if err != nil {
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	if user_login.Role == "pengguna" {
+		return GCFHandlerUpdateByPengguna(idparam, user_login.Id, pengguna, conn, r)
+	}
+	
+	Response.Message = "Maneh tidak memiliki akses"
+	return GCFReturnStruct(Response)
+}
+
+func GCFHandlerUpdateByPengguna(idparam, iduser primitive.ObjectID,  pengguna model.Pengguna, conn *mongo.Database, r *http.Request) string {
+	Response.Status = false
+	//
+	err := UpdatePengguna(idparam, iduser, conn, pengguna)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
+	//
 	Response.Status = true
 	Response.Message = "Berhasil Update Pengguna"
 	return GCFReturnStruct(Response)
 }
+
+
 
 func GCFHandlerGetAllPengguna(MONGOCONNSTRINGENV, dbname string) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
@@ -441,24 +489,61 @@ func GCFHandlerGetAllPengguna(MONGOCONNSTRINGENV, dbname string) string {
 
 func GCFHandlerGetPenggunaFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-	var Response model.Response
 	Response.Status = false
-	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
-	if payload.Role != "pengguna" {
-		Response.Message = "Anda bukan pengguna"
+	if user_login.Role != "pengguna" {
+		return GCFReturnStruct(Response)
+		return GCFHandlerGetPenggunaByPengguna(user_login.Id, conn)
+	}
+	if user_login.Role == "admin" {
+		return GCFHandlerGetPenggunaByAdmin(conn, r)
+	}
+	Response.Message = "Kamu tidak memiliki akses"
+	return GCFReturnStruct(Response)
+	
+}
+
+func GCFHandlerGetPenggunaByAdmin(conn *mongo.Database, r *http.Request) string {
+	Response.Status = false
+	//
+	id := GetID(r)
+	if id == "" {
+		pengguna, err := GetAllPenggunaByAdmin(conn)
+		if err != nil {
+			Response.Message = err.Error()
+			return GCFReturnStruct(Response)
+		}
+		return GCFReturnStruct(pengguna)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
 		return GCFReturnStruct(Response)
 	}
-	data, err := GetPenggunaFromAkun(payload.Id, conn)
+	pengguna, err := GetPenggunaFromIDByAdmin(idparam, conn)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
-	return GCFReturnStruct(data)
+	//
+	return GCFReturnStruct(pengguna)
+}
+
+func GCFHandlerGetPenggunaByPengguna(iduser primitive.ObjectID, conn *mongo.Database) string {
+	Response.Status = false
+	//
+	pengguna, err := GetPenggunaFromAkun(iduser, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	//
+	return GCFReturnStruct(pengguna)
 }
 
 // driver

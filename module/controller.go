@@ -460,7 +460,7 @@ func UpdatePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database, inse
 		return err
 	}
 	if pengguna.ID != idparam {
-		return fmt.Errorf("anda bukan pemilik data ini")
+		return fmt.Errorf("Anda bukan pemilik data ini")
 	}
 	if insertedDoc.NamaLengkap == "" || insertedDoc.TanggalLahir == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == ""{
 		return fmt.Errorf("Dimohon untuk melengkapi data")
@@ -520,6 +520,43 @@ func GetPenggunaFromAkun(akun primitive.ObjectID, db *mongo.Database) (doc model
 		return doc, fmt.Errorf("kesalahan server")
 	}
 	return doc, nil
+}
+
+//by admin
+func GetPenggunaFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (pengguna model.Pengguna, err error) {
+	collection := db.Collection("pengguna")
+	filter := bson.M{
+		"_id": idparam,
+	}
+	err = collection.FindOne(context.Background(), filter).Decode(&pengguna)
+	if err != nil {
+		return pengguna, fmt.Errorf("error GetPenggunaFromID mongo: %s", err)
+	}
+	user, err := GetUserFromID(pengguna.Akun.ID, db)
+	if err != nil {
+		return pengguna, fmt.Errorf("error GetPenggunaFromID mongo: %s", err)
+	}
+	akun := model.User{
+		ID: user.ID,
+		Email: user.Email,
+		Role: user.Role,
+	}
+	pengguna.Akun = akun
+	return pengguna, nil
+}
+
+func GetAllPenggunaByAdmin(db *mongo.Database) (pengguna []model.Pengguna, err error) {
+	collection := db.Collection("pengguna")
+	filter := bson.M{}
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		return pengguna, fmt.Errorf("error GetAllPengguna mongo: %s", err)
+	}
+	err = cursor.All(context.Background(), &pengguna)
+	if err != nil {
+		return pengguna, fmt.Errorf("error GetAllPengguna context: %s", err)
+	}
+	return pengguna, nil
 }
 
 // driver
