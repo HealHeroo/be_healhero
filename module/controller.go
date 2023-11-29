@@ -341,10 +341,6 @@ func UpdatePasswordUser(iduser primitive.ObjectID, db *mongo.Database, insertedD
 	if err != nil {
 		return fmt.Errorf("kesalahan server : salt")
 	}
-	hash := argon2.IDKey([]byte(insertedDoc.Password), salt, 1, 64*1024, 4, 32)
-	if hex.EncodeToString(hash) != dataUser.Password {
-		return fmt.Errorf("password lama salah")
-	}
 	if insertedDoc.Newpassword == ""  {
 		return fmt.Errorf("mohon untuk melengkapi data")
 	}
