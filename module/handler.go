@@ -147,7 +147,7 @@ func GCFHandlerUpdatePasswordUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname
 	}
 	//
 	Response.Status = true
-	Response.Message = "Berhasil Update Password"
+	Response.Message = "Berhasil Update Password Kamu"
 	return GCFReturnStruct(Response)
 }
 
