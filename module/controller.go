@@ -270,14 +270,14 @@ func UpdateEmailUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc 
 		return err
 	}
 	if insertedDoc.Email == "" {
-		return fmt.Errorf("mohon untuk melengkapi data")
+		return fmt.Errorf("Dimohon untuk melengkapi data")
 	}
 	if err = checkmail.ValidateFormat(insertedDoc.Email); err != nil {
-		return fmt.Errorf("email tidak valid")
+		return fmt.Errorf("Email tidak valid")
 	}
 	existsDoc, _ := GetUserFromEmail(insertedDoc.Email, db)
 	if existsDoc.Email == insertedDoc.Email {
-		return fmt.Errorf("email sudah terdaftar")
+		return fmt.Errorf("Email sudah terdaftar")
 	}
 	user := bson.M{
 		"email": insertedDoc.Email,

@@ -298,6 +298,32 @@ func Get(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request)
 	return GCFReturnStruct(Response)
 }
 
+//email
+func Put(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+	//
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+	if err != nil {
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		Response.Message = "error parsing application/json: " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	err = UpdateEmailUser(user_login.Id, conn, user)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	//
+	Response.Status = true
+	Response.Message = "Berhasil Update Email"
+	return GCFReturnStruct(Response)
+}
+
 
 // func GCFHandlerGetAllUserByAdmin(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 // 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
