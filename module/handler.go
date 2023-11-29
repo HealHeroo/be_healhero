@@ -7,6 +7,7 @@ import (
 
 	"github.com/HealHeroo/be_healhero/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -188,7 +189,7 @@ func GCFHandlerGetUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r 
 	}
 	id := GetID(r)
 	if id == "" {
-		return GCFHandlerGetAllUserByAdmin(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname, r)
+		return GCFHandlerGetAllUserByAdmin(conn)
 	}
 	idparam, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -239,26 +240,96 @@ func GCFHandlerGetUserFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname stri
 	}
 	return GCFReturnStruct(data)
 }
-
-func GCFHandlerGetAllUserByAdmin(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// get
+func Get(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-	var Response model.Response
 	Response.Status = false
-	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	//
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
 	if err != nil {
 		Response.Message = "Gagal Decode Token : " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	if payload.Role != "admin" {
-		Response.Message = "Anda bukan admin"
+	if user_login.Role != "admin" {
+		Response.Message = "Kamu BUkan Admin"
 		return GCFReturnStruct(Response)
 	}
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllUserByAdmin(conn)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
+	}
+	user, err := GetUserFromID(idparam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	if user.Role == "pengguna" {
+		pengguna, err := GetPenggunaFromAkun(user.ID, conn)
+		if err != nil {
+			Response.Message = err.Error()
+			return GCFReturnStruct(Response)
+		}
+		return GCFReturnStruct(pengguna)
+	}
+	if user.Role == "driver" {
+		driver, err := GetDriverFromAkun(user.ID, conn)
+		if err != nil {
+			Response.Message = err.Error()
+			return GCFReturnStruct(Response)
+		}
+		return GCFReturnStruct(driver)
+	}
+	
+	if user.Role == "admin" {
+		admin, err := GetUserFromID(user_login.Id, conn)
+		if err != nil {
+			Response.Message = err.Error()
+			return GCFReturnStruct(Response)
+		}
+		return GCFReturnStruct(admin)
+	}
+	//
+	Response.Message = "Tidak ada data"
+	return GCFReturnStruct(Response)
+}
+
+
+// func GCFHandlerGetAllUserByAdmin(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+// 	var Response model.Response
+// 	Response.Status = false
+// 	tokenstring := r.Header.Get("Authorization")
+// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+// 	if err != nil {
+// 		Response.Message = "Gagal Decode Token : " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	if payload.Role != "admin" {
+// 		Response.Message = "Anda bukan admin"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	data, err := GetAllUser(conn)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	return GCFReturnStruct(data)
+// }
+
+func GCFHandlerGetAllUserByAdmin(conn *mongo.Database) string {
+	Response.Status = false
+	//
 	data, err := GetAllUser(conn)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
+	//
 	return GCFReturnStruct(data)
 }
 
