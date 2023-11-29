@@ -520,7 +520,7 @@ func GCFHandlerGetPenggunaFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname 
 	if user_login.Role == "admin" {
 		return GCFHandlerGetPenggunaByAdmin(conn, r)
 	}
-	Response.Message = "kamu tidak memiliki akses"
+	Response.Message = "Kamu tidak memiliki akses"
 	return GCFReturnStruct(Response)
 	
 }
