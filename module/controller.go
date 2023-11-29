@@ -559,6 +559,57 @@ func GetAllPenggunaByAdmin(db *mongo.Database) (pengguna []model.Pengguna, err e
 	return pengguna, nil
 }
 
+func GetDriverFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (driver model.Driver, err error) {
+	collection := db.Collection("driver")
+	filter := bson.M{
+		"_id": idparam,
+	}
+	err = collection.FindOne(context.Background(), filter).Decode(&driver)
+	if err != nil {
+		return driver, err
+	}
+	user, err := GetUserFromID(driver.Akun.ID, db)
+	if err != nil {
+		return driver, err
+	}
+	akun := model.User{
+		ID:    user.ID,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+	driver.Akun = akun
+	return driver, nil
+}
+
+// func GetAllDriverByAdmin(db *mongo.Database) (driver model.Driver, err error) {
+// 	collection := db.Collection("driver")
+// 	filter := bson.M{}
+// 	cursor, err := collection.Find(context.Background(), filter)
+// 	if err != nil {
+// 		return driver, err
+// 	}
+// 	err = cursor.All(context.Background(), &driver)
+// 	if err != nil {
+// 		return driver, err
+// 	}
+// 	for _, m := range driver {
+// 		user, err := GetUserFromID(m.Akun.ID, db)
+// 		if err != nil {
+// 			return driver, err
+// 		}
+// 		akun := model.User{
+// 			ID:    user.ID,
+// 			Email: user.Email,
+// 			Role:  user.Role,
+// 		}
+// 		m.Akun = akun
+// 		driver = append(driver, m)
+// 		driver = driver[1:]
+// 	}
+// 	return driver, nil
+// }
+
+
 // driver
 func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Driver) error {
 	driver, err := GetDriverFromAkun(iduser, db)
