@@ -17,6 +17,8 @@ var (
 	driver model.Driver
 	obat model.Obat
 	order model.Order
+	password model.Password
+
 )
 
 // signup
@@ -121,8 +123,34 @@ func GCFHandlerUpdateEmailUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname st
 	return GCFReturnStruct(Response)
 }
 
+// func GCFHandlerUpdatePasswordUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)	
+// 	Response.Status = false
+// 	//
+// 	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
+// 	if err != nil {
+// 		Response.Message = "Gagal Decode Token : " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	var password model.Password
+// 	err = json.NewDecoder(r.Body).Decode(&password)
+// 	if err != nil {
+// 		Response.Message = "error parsing application/json: " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	err = UpdatePasswordUser(user_login.Id, conn, password)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	//
+// 	Response.Status = true
+// 	Response.Message = "Berhasil Update Password"
+// 	return GCFReturnStruct(Response)
+// }
+
 func GCFHandlerUpdatePasswordUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
-	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)	
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	Response.Status = false
 	//
 	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
@@ -130,7 +158,6 @@ func GCFHandlerUpdatePasswordUser(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname
 		Response.Message = "Gagal Decode Token : " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	var password model.Password
 	err = json.NewDecoder(r.Body).Decode(&password)
 	if err != nil {
 		Response.Message = "error parsing application/json: " + err.Error()

@@ -345,6 +345,9 @@ func UpdatePasswordUser(iduser primitive.ObjectID, db *mongo.Database, insertedD
 	if hex.EncodeToString(hash) != dataUser.Password {
 		return fmt.Errorf("password lama salah")
 	}
+	if insertedDoc.Newpassword == ""  {
+		return fmt.Errorf("mohon untuk melengkapi data")
+	}
 	if strings.Contains(insertedDoc.Newpassword, " ") {
 		return fmt.Errorf("password tidak boleh mengandung spasi")
 	}
