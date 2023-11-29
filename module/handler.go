@@ -597,19 +597,15 @@ func GCFHandlerUpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Databa
 	if driver.ID != idparam {
 		return fmt.Errorf("kamu bukan pemilik data ini")
 	}
-	if insertedDoc.Nama == "" || insertedDoc.NoHpNarahubung == "" || insertedDoc.Nama == "" || insertedDoc.Kategori == "" || insertedDoc.SektorIndustri == "" || insertedDoc.Alamat == "" || insertedDoc.Website == "" {
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == ""  {
 		return fmt.Errorf("mohon untuk melengkapi data")
 	}
 	mtr := bson.M{
-		"namanarahubung": insertedDoc.NamaNarahubung,
-		"nohpnarahubung": insertedDoc.NoHpNarahubung,
-		"nama":           insertedDoc.Nama,
-		"kategori":       insertedDoc.Kategori,
-		"sektorindustri": insertedDoc.SektorIndustri,
-		"tentang":        insertedDoc.Tentang,
-		"alamat":         insertedDoc.Alamat,
-		"website":        insertedDoc.Website,
-		"mou":            0,
+		"namalengkap": 		insertedDoc.NamaLengkap,
+		"jeniskelamin": 	insertedDoc.JenisKelamin,
+		"nomorhp":          insertedDoc.NomorHP,
+		"alamat":     	 	insertedDoc.Alamat,
+		"platmotor": 		insertedDoc.PlatMotor,
 		"akun": model.User{
 			ID: driver.Akun.ID,
 		},
