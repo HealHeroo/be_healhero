@@ -194,17 +194,17 @@ func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 		return fmt.Errorf("Dimohon untuk melengkapi data")
 	} 
 	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
-		return fmt.Errorf("email tidak valid")
+		return fmt.Errorf("Email tidak valid")
 	} 
 	userExists, _ := GetUserFromEmail(insertedDoc.Akun.Email, db)
 	if insertedDoc.Akun.Email == userExists.Email {
-		return fmt.Errorf("email sudah terdaftar")
+		return fmt.Errorf("Email sudah terdaftar")
 	} 
 	if strings.Contains(insertedDoc.Akun.Password, " ") {
-		return fmt.Errorf("password tidak boleh mengandung spasi")
+		return fmt.Errorf("Password tidak boleh mengandung spasi")
 	}
 	if len(insertedDoc.Akun.Password) < 8 {
-		return fmt.Errorf("password terlalu pendek")
+		return fmt.Errorf("Password terlalu pendek")
 	}
 	salt := make([]byte, 16)
 	_, err := rand.Read(salt)
