@@ -712,6 +712,30 @@ func GCFHandlerUpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Databa
 	return nil
 }
 
+func GCFHandlerGetDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllDriver(MONGOCONNSTRINGENV, dbname)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	obat, err := GetDriverFromID(idParam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	return GCFReturnStruct(obat)
+}
+
 func GCFHandlerGetAllDriver(MONGOCONNSTRINGENV, dbname string) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
