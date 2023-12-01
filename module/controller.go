@@ -679,7 +679,7 @@ func GetDriverFromAkun(akun primitive.ObjectID, db *mongo.Database) (doc model.D
 
 func InsertObat(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Obat) error {
 	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == "" || insertedDoc.Keterangan == "" || insertedDoc.Harga == "" {
-		return fmt.Errorf("mohon untuk melengkapi data")
+		return fmt.Errorf("Mohon untuk melengkapi data")
 	}
 
 	obt := bson.M{
