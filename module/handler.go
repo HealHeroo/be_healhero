@@ -505,6 +505,84 @@ func GCFHandlerGetAllPengguna(MONGOCONNSTRINGENV, dbname string) string {
 	return GCFReturnStruct(data)
 }
 
+func GCFHandlerGetPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllPengguna(MONGOCONNSTRINGENV, dbname)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	obat, err := GetPenggunaFromID(idParam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	return GCFReturnStruct(obat)
+}
+
+
+// func GCFHandlerGetPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+// 	var Response model.Response
+// 	Response.Status = false
+// 	tokenstring := r.Header.Get("Authorization")
+// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+// 	if err != nil {
+// 		Response.Message = "Gagal Decode Token : " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	if payload.Role != "admin" {
+// 		return GCFHandlerGetPenggunaFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname, r)
+// 	}
+// 	id := GetID(r)
+// 	if id == "" {
+// 		return GCFHandlerGetAllPenggunaByAdmin(conn)
+// 	}
+// 	idparam, err := primitive.ObjectIDFromHex(id)
+// 	if err != nil {
+// 		Response.Message = "Invalid id parameter"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	data, err := GetUserFromID(idparam, conn)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	if data.Role == "pengguna" {
+// 		datapengguna, err := GetPenggunaFromAkun(data.ID, conn)
+// 		if err != nil {
+// 			Response.Message = err.Error()
+// 			return GCFReturnStruct(Response)
+// 		}
+// 		datapengguna.Akun = data
+// 		return GCFReturnStruct(datapengguna) 
+// 	}
+// 	Response.Message = "Tidak ada data"
+// 	return GCFReturnStruct(Response)
+// }
+
+func GCFHandlerGetAllPenggunaByAdmin(conn *mongo.Database) string {
+	Response.Status = false
+	//
+	data, err := GetAllUser(conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	//
+	return GCFReturnStruct(data)
+}
+
+
 func GCFHandlerGetPenggunaFromID(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	Response.Status = false
