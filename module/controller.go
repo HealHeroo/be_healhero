@@ -771,12 +771,14 @@ func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, inserte
 	ord := bson.M{
 		"pengguna": bson.M{
 			"_id" : iduser,
+			"namalengkap" : iduser,
 		},
 		"driver": bson.M{
 			"_id" : insertedDoc.Driver.ID,
 		},
 		"obat": bson.M{
 			"_id" : idparam,
+			"nama_obat" : idparam,
 		},
 		"namaobat":    insertedDoc.NamaObat,
 		"quantity":    insertedDoc.Quantity,
@@ -851,5 +853,38 @@ func GetAllOrder(db *mongo.Database) (order []model.Order, err error) {
 	if err != nil {
 		return order, fmt.Errorf("error GetAllOrder context: %s", err)
 	}
+	
 	return order, nil
 }
+
+// func GetOrderByAdmin(db *mongo.Database) (order []model.Order, err error) {
+// 	collection := db.Collection("order")
+// 	filter := bson.M{}
+// 	cursor, err := collection.Find(context.Background(), filter)
+// 	if err != nil {
+// 		return order, fmt.Errorf("error GetOrderByAdmin mongo: %s", err)
+// 	}
+// 	err = cursor.All(context.Background(), &order)
+// 	if err != nil {
+// 		return order, fmt.Errorf("error GetOrderByAdmin context: %s", err)
+// 	}
+// 	for _, m := range order {
+// 		order, err := GetOrderFromID(m.Order.ID, db)
+// 		if err != nil {
+// 			return order, fmt.Errorf("error GetOrderByAdmin get order: %s", err)
+// 		}
+// 		m.order = order
+// 		order, err := GetOrderFromID(m.Order.ID, db)
+// 		if err != nil {
+// 			return order, fmt.Errorf("error GetOrderByAdmin get order: %s", err)
+// 		}
+// 		m.Order = order
+// 		Pengguna, _ := GetPenggunaFromID(m.Pengguna.ID, db)
+// 		m.Pengguna = pengguna
+// 		mentor, _ := GetMentorFromID(m.Mentor.ID, db)
+// 		m.Mentor = mentor
+// 		order = append(order, m)
+// 		order = order[1:]
+// 	}
+// 	return order, nil
+// }
