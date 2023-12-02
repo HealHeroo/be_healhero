@@ -770,7 +770,7 @@ func GetAllObat(db *mongo.Database) (obat []model.Obat, err error) {
 	return obat, nil
 }
 
-func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (doc []model.Obat, err error) {
+func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Obat, err error) {
 	collection := db.Collection("obat")
 	filter := bson.M{"_id": _id}
 	err = collection.FindOne(context.TODO(), filter).Decode(&doc)
