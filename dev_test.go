@@ -179,10 +179,10 @@ func TestUpdatePengguna(t *testing.T) {
 	objectId, _ := primitive.ObjectIDFromHex(id)
 	id2 := "655c3b9a1d6524f2f1200fc6"
 	userid, _ := primitive.ObjectIDFromHex(id2)
-	doc.NamaLengkap = "Marlina M Lubis"
+	doc.NamaLengkap = "Marlina Lubis"
 	doc.TanggalLahir = "30/08/2003"
 	doc.JenisKelamin = "Perempuan"
-	doc.NomorHP = "081237629321"
+	doc.NomorHP = "081237629371"
 	doc.Alamat = "Jalan Sarijadi No 53"
 	if doc.NamaLengkap == "" || doc.TanggalLahir == "" || doc.JenisKelamin == "" || doc.NomorHP == "" || doc.Alamat == "" {
 		t.Errorf("mohon untuk melengkapi data")
@@ -245,6 +245,33 @@ func TestInsertObat(t *testing.T) {
 	}
 }
 
+// func TestUpdateObat(t *testing.T) {
+// 	conn := module.MongoConnect("MONGOSTRING", "healhero_db")
+// 	payload, err := module.Decode("2d2bdc3a1fca7cc064174e2a6e63e2b78f1db16de9e9ed42e63646709de4a1a", "v4.public.eyJleHAiOiIyMDIzLTExLTIxVDE2OjA2OjM4KzA3OjAwIiwiaWF0IjoiMjAyMy0xMS0yMVQxNDowNjozOCswNzowMCIsImlkIjoiNjU1YzNiOWI0ZjZhNzVkZGFlZWNhMTkxIiwibmJmIjoiMjAyMy0xMS0yMVQxNDowNjozOCswNzowMCIsInJvbGUiOiJhZG1pbiJ9mGLShR1CooldqYp11ygx8dJt0UNUrj4XfIegnwhriKeZSfuv-9SOcr2XG5KKO1r0hL3_V8QFCev__cJgEaTzBA")
+// 	if err != nil {
+// 		t.Errorf("Error decode token: %v", err)
+// 	}
+// 	if payload.Role != "admin" {
+// 		t.Errorf("Error role: %v", err)
+// 	}
+// 	var dataobat model.Obat
+// 	dataobat.NamaObat = "Paracetamol 500Mg"
+// 	dataobat.JenisObat = "Analgesik dan Antipiretik"
+// 	dataobat.Keterangan = "500 Mg"
+// 	dataobat.Harga = "Rp 10.000"
+// 	id := "65687b87d83eb5fac7049b29"
+// 	objectId, err := primitive.ObjectIDFromHex(id)
+// 	if err != nil{
+// 		t.Fatalf("error converting id to objectID: %v", err)
+// 	}
+// 	err = module.UpdateObat(objectId, payload.Id, conn, dataobat)
+// 	if err != nil {
+// 		t.Errorf("Error update : %v", err)
+// 	} else {
+// 		fmt.Println("Success!!!")
+// 	}
+// }
+
 func TestUpdateObat(t *testing.T) {
 	conn := module.MongoConnect("MONGOSTRING", "healhero_db")
 	payload, err := module.Decode("2d2bdc3a1fca7cc064174e2a6e63e2b78f1db16de9e9ed42e63646709de4a1a", "v4.public.eyJleHAiOiIyMDIzLTExLTIxVDE2OjA2OjM4KzA3OjAwIiwiaWF0IjoiMjAyMy0xMS0yMVQxNDowNjozOCswNzowMCIsImlkIjoiNjU1YzNiOWI0ZjZhNzVkZGFlZWNhMTkxIiwibmJmIjoiMjAyMy0xMS0yMVQxNDowNjozOCswNzowMCIsInJvbGUiOiJhZG1pbiJ9mGLShR1CooldqYp11ygx8dJt0UNUrj4XfIegnwhriKeZSfuv-9SOcr2XG5KKO1r0hL3_V8QFCev__cJgEaTzBA")
@@ -255,20 +282,22 @@ func TestUpdateObat(t *testing.T) {
 		t.Errorf("Error role: %v", err)
 	}
 	var dataobat model.Obat
-	dataobat.NamaObat = "Paracetamol 500Mg"
-	dataobat.JenisObat = "Analgesik dan Antipiretik"
-	dataobat.Keterangan = "500 Mg"
-	dataobat.Harga = "Rp 10.000"
-	id := "655c3b9b4f6a75ddaeeca191"
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil{
-		t.Fatalf("error converting id to objectID: %v", err)
-	}
-	err = module.UpdateObat(objectId, payload.Id, conn, dataobat)
-	if err != nil {
-		t.Errorf("Error update : %v", err)
+	id := "656879cdd83eb5fac7049b27"
+	objectId, _ := primitive.ObjectIDFromHex(id)
+	dataobat.NamaObat = "Marlina Lubis"
+	dataobat.JenisObat = "30/08/2003"
+	dataobat.Keterangan = "Perempuan"
+	dataobat.Harga = "081237629371"
+	if dataobat.NamaObat == "" || dataobat.JenisObat == "" || dataobat.Keterangan == "" || dataobat.Harga == "" {
+		t.Errorf("mohon untuk melengkapi data")
 	} else {
-		fmt.Println("Success!!!")
+		err := module.UpdateObat(objectId, payload.Id,conn,  dataobat)
+		if err != nil {
+			t.Errorf("Error inserting document: %v", err)
+			fmt.Println("Data tidak berhasil diupdate")
+		} else {
+			fmt.Println("Data berhasil diupdate")
+		}
 	}
 }
 
@@ -281,7 +310,7 @@ func TestDeleteObat(t *testing.T) {
 	// if payload.Role != "mitra" {
 	// 	t.Errorf("Error role: %v", err)
 	// }
-	id := "655c3b9b4f6a75ddaeeca191"
+	id := "65687b87d83eb5fac7049b29"
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil{
 		t.Fatalf("error converting id to objectID: %v", err)

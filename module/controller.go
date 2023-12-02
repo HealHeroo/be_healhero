@@ -696,29 +696,53 @@ func InsertObat(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model
 	return nil
 }
 
+// func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Obat) error {
+// 	_, err := GetObatFromID(idparam, db)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == "" || insertedDoc.Keterangan == "" || insertedDoc.Harga == "" {
+// 		return fmt.Errorf("mohon untuk melengkapi data")
+// 	}
+// 	obt := bson.M{
+// 		"namaobat": insertedDoc.NamaObat,
+// 		"jenisobat": insertedDoc.JenisObat,
+// 		"keterangan": insertedDoc.Keterangan,
+// 		"harga": insertedDoc.Harga,
+		
+// 	}
+
+// 	err = UpdateOneDoc(idparam, db, "obat", obt)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
 func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Obat) error {
-	_, err := GetObatFromID(idparam, db)
+	obat, err :=GetObatFromID(iduser, db)
 	if err != nil {
 		return err
 	}
-	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == "" || insertedDoc.Keterangan == "" || insertedDoc.Harga == "" {
+	if obat.ID != idparam {
+		return fmt.Errorf("kamu bukan pemilik data ini")
+	}
+	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == ""|| insertedDoc.Keterangan == "" || insertedDoc.Harga == ""   {
 		return fmt.Errorf("mohon untuk melengkapi data")
 	}
-	obt := bson.M{
-		"namaobat": insertedDoc.NamaObat,
-		"jenisobat": insertedDoc.JenisObat,
+	data := bson.M{
+		"nama_obat": insertedDoc.NamaObat,
+		"jenis_obat": insertedDoc.JenisObat,
 		"keterangan": insertedDoc.Keterangan,
 		"harga": insertedDoc.Harga,
 		
 	}
-
-	err = UpdateOneDoc(idparam, db, "obat", obt)
+	err = UpdateOneDoc(idparam, db, "obat", data)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
 
 func DeleteObat(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
 	_, err := GetObatFromID(idparam, db)

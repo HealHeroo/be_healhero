@@ -856,14 +856,53 @@ func GCFHandlerInsertObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string,
 	return GCFReturnStruct(Response)
 }
 
+// func GCFHandlerUpdateObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+// 	var Response model.Response
+// 	Response.Status = false
+// 	tokenstring := r.Header.Get("Authorization")
+// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+// 	if err != nil {
+// 		Response.Message = "Gagal Decode Token : " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	id := GetID(r)
+// 	if id == "" {
+// 		Response.Message = "Wrong parameter"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	idparam, err := primitive.ObjectIDFromHex(id)
+// 	if err != nil {
+// 		Response.Message = "Invalid id parameter"
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	var dataobat model.Obat
+// 	err = json.NewDecoder(r.Body).Decode(&dataobat)
+// 	if err != nil {
+// 		Response.Message = "error parsing application/json: " + err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	err = UpdateObat(idparam, payload.Id, conn, dataobat)
+// 	if err != nil {
+// 		Response.Message = err.Error()
+// 		return GCFReturnStruct(Response)
+// 	}
+// 	Response.Status = true
+// 	Response.Message = "Berhasil Update Obat"
+// 	return GCFReturnStruct(Response)
+// }
+
 func GCFHandlerUpdateObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-	var Response model.Response
 	Response.Status = false
-	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	//
+	user_login, err := GetUserLogin(PASETOPUBLICKEYENV, r)
 	if err != nil {
 		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	if user_login.Role != "admin" {
+		Response.Message = "Kamu tidak memiliki akses"
 		return GCFReturnStruct(Response)
 	}
 	id := GetID(r)
@@ -871,22 +910,22 @@ func GCFHandlerUpdateObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string,
 		Response.Message = "Wrong parameter"
 		return GCFReturnStruct(Response)
 	}
-	idparam, err := primitive.ObjectIDFromHex(id)
+	idobat, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		Response.Message = "Invalid id parameter"
 		return GCFReturnStruct(Response)
 	}
-	var dataobat model.Obat
-	err = json.NewDecoder(r.Body).Decode(&dataobat)
+	err = json.NewDecoder(r.Body).Decode(&obat)
 	if err != nil {
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = UpdateObat(idparam, payload.Id, conn, dataobat)
+	err = UpdateObat(idobat, user_login.Id, conn, obat)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
 	}
+	//
 	Response.Status = true
 	Response.Message = "Berhasil Update Obat"
 	return GCFReturnStruct(Response)
