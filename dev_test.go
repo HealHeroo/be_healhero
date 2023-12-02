@@ -224,7 +224,7 @@ func TestInsertOneOrder(t *testing.T) {
 }
 
 //test pesanan
-func TestInsertOnePesanan(t *testing.T) {
+func TestInsertPesanan(t *testing.T) {
 	var doc model.Pesanan
 	doc.Nama= "Juli Febrian"
 	doc.Alamat= "Jl. Mangga No 67"
