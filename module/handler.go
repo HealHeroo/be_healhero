@@ -861,7 +861,7 @@ func GCFHandlerUpdateObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string,
 	var Response model.Response
 	Response.Status = false
 	tokenstring := r.Header.Get("Authorization")
-	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	user_login, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
 	if err != nil {
 		Response.Message = "Gagal Decode Token : " + err.Error()
 		return GCFReturnStruct(Response)
@@ -882,7 +882,7 @@ func GCFHandlerUpdateObat(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string,
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = UpdateObat(idparam, payload.Id, conn, dataobat)
+	err = UpdateObat(idparam, user_login.Id, conn, dataobat)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
