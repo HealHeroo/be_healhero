@@ -704,7 +704,7 @@ func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, inserted
 	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == "" || insertedDoc.Keterangan == "" || insertedDoc.Harga == "" {
 		return fmt.Errorf("mohon untuk melengkapi data")
 	}
-	obt := bson.M{
+	data := bson.M{
 		"nama_obat": insertedDoc.NamaObat,
 		"jenis_obat": insertedDoc.JenisObat,
 		"keterangan": insertedDoc.Keterangan,
@@ -712,7 +712,7 @@ func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, inserted
 		
 	}
 
-	err = UpdateOneDoc(idparam, db, "obat", obt)
+	err = UpdateOneDoc(idparam, db, "obat", data)
 	if err != nil {
 		return err
 	}
