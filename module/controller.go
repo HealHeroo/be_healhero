@@ -881,6 +881,78 @@ func GetAllOrder(db *mongo.Database) (order []model.Order, err error) {
 	return order, nil
 }
 
+
+//pesanan 
+
+func InsertPesanan(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Pesanan) error {
+
+	if insertedDoc.Nama == "" || insertedDoc.Alamat == "" || insertedDoc.NomorHP == "" || insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.Harga == "" || insertedDoc.TotalHarga == ""|| insertedDoc.Status == ""{
+		return fmt.Errorf("harap lengkapi semua data pesanan")
+	}
+
+	psn := bson.M{
+
+		"nama":    insertedDoc.Nama,
+		"alamat":    insertedDoc.Alamat,
+		"nomorhp":    insertedDoc.NomorHP,
+		"namaobat":    insertedDoc.NamaObat,
+		"quantity":    insertedDoc.Quantity,
+		"harga":    insertedDoc.Harga,
+		"totalharga":    insertedDoc.TotalHarga,
+		"status":   insertedDoc.Status,
+	}
+
+	_, err := InsertOneDoc(db, "pesanan", psn)
+	if err != nil {
+		return fmt.Errorf("error saat menyimpan data pesanan: %s", err)
+	}
+	return nil
+}
+
+func DeletePesanan(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
+	_, err := GetPesananFromID(idparam, db)
+	if err != nil {
+		return err
+	}
+	err = DeleteOneDoc(idparam, db, "obat")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+
+func GetAllPesanan(db *mongo.Database) (pesanan []model.Pesanan, err error) {
+	collection := db.Collection("pesanan")
+	filter := bson.M{}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		return pesanan, fmt.Errorf("error GetAllPesanan mongo: %s", err)
+	}
+	err = cursor.All(context.TODO(), &pesanan)
+	if err != nil {
+		return pesanan, fmt.Errorf("error GetAllPesanan context: %s", err)
+	}
+	
+	return pesanan, nil
+}
+
+
+func GetPesananFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Pesanan, err error) {
+	collection := db.Collection("pesanan")
+	filter := bson.M{"_id": _id}
+	err = collection.FindOne(context.TODO(), filter).Decode(&doc)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return doc, fmt.Errorf("_id tidak ditemukan")
+		}
+		return doc, err
+	}
+	return doc, nil
+}
+
+
 // func GetOrderByAdmin(db *mongo.Database) (order []model.Order, err error) {
 // 	collection := db.Collection("order")
 // 	filter := bson.M{}

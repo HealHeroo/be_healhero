@@ -81,6 +81,7 @@ func TestInsertUser(t *testing.T) {
 	}
 }
 
+
 func TestGetUserByAdmin(t *testing.T) {
 	id := "655c3b9a1d6524f2f1200fc5"
 	idparam, err := primitive.ObjectIDFromHex(id)
@@ -213,6 +214,30 @@ func TestInsertOneOrder(t *testing.T) {
 	   t.Errorf("mohon untuk melengkapi data")
    } else {
 	   insertedID, err := module.InsertOneDoc(db, "order", doc)
+	   if err != nil {
+		   t.Errorf("Error inserting document: %v", err)
+		   fmt.Println("Data tidak berhasil disimpan")
+	   } else {
+	   fmt.Println("Data berhasil disimpan dengan id :", insertedID.Hex())
+	   }
+   }
+}
+
+//test pesanan
+func TestInsertOnePesanan(t *testing.T) {
+	var doc model.Pesanan
+	doc.Nama= "Juli Febrian"
+	doc.Alamat= "Jl. Mangga No 67"
+	doc.NomorHP= "081263726374"
+	doc.NamaObat= "Vometa"
+    doc.Quantity= "1"
+	doc.Harga= "Rp. 7000"
+	doc.TotalHarga= "Rp. 7000"
+	doc.Status= "Dikirim Oleh Kurir"
+   if  doc.Nama == "" || doc.Alamat == "" || doc.NomorHP == "" || doc.NamaObat == "" || doc.Quantity == "" ||doc.Harga == "" ||doc.TotalHarga == "" ||doc.Status == ""  {
+	   t.Errorf("mohon untuk melengkapi data")
+   } else {
+	   insertedID, err := module.InsertOneDoc(db, "pesanan", doc)
 	   if err != nil {
 		   t.Errorf("Error inserting document: %v", err)
 		   fmt.Println("Data tidak berhasil disimpan")

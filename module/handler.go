@@ -1148,6 +1148,135 @@ func GCFHandlerGetOrder(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r
 }
 
 
+//pesanan
+
+
+func GCFHandlerInsertPesanan(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	tokenstring := r.Header.Get("Authorization")
+	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	if err != nil {
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	var datapesanan model.Pesanan
+	err = json.NewDecoder(r.Body).Decode(&datapesanan)
+	if err != nil {
+		Response.Message = "error parsing application/json: " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Wrong parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+	err = InsertPesanan(idParam, payload.Id, conn, datapesanan)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Berhasil Insert Pesanan"
+	return GCFReturnStruct(Response)
+}
+
+
+func GCFHandlerDeletePesanan(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	tokenstring := r.Header.Get("Authorization")
+	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	if err != nil {
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Wrong parameter"
+		return GCFReturnStruct(Response)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
+	}
+	err = DeletePesanan(idparam, payload.Id, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Berhasil Delete Pesanan"
+	return GCFReturnStruct(Response)
+}
+
+func GCFHandlerGetAllPesanan(MONGOCONNSTRINGENV, dbname string) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	data, err := GetAllPesanan(conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	return GCFReturnStruct(data)
+}
+
+func GCFHandlerGetPesananFromID(MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllPesanan(MONGOCONNSTRINGENV, dbname)
+	}
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
+	}
+	data, err := GetOrderFromID(objID, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	return GCFReturnStruct(data)
+}
+
+func GCFHandlerGetPesanan(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	id := GetID(r)
+	if id == "" {
+		return GCFHandlerGetAllPesanan(MONGOCONNSTRINGENV, dbname)
+	}
+
+	idParam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid ID parameter"
+		return GCFReturnStruct(Response)
+	}
+
+	pesanan, err := GetPesananFromID(idParam, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	return GCFReturnStruct(pesanan)
+}
+
+
 
 // return struct
 func GCFReturnStruct(DataStuct any) string {

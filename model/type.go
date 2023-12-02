@@ -72,6 +72,18 @@ type Obat struct {
 	Harga       string           `json:"harga,omitempty" bson:"harga,omitempty"`
 }
 
+type Pesanan struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Nama    string            `json:"nama,omitempty" bson:"nama,omitempty"`
+	Alamat   string            `json:"alamat,omitempty" bson:"alamat,omitempty"`
+	NomorHP   string            `json:"nomorhp,omitempty" bson:"nomorhp,omitempty"`
+	NamaObat  string            `json:"namaobat,omitempty" bson:"namaobat,omitempty"`
+	Quantity  string            `json:"quantity,omitempty" bson:"quantity,omitempty"`
+	Harga       string           `json:"harga,omitempty" bson:"harga,omitempty"`
+	TotalHarga       string           `json:"totalharga,omitempty" bson:"totalharga,omitempty"`
+	Status    	  string           	 `json:"status,omitempty" bson:"status,omitempty"`
+}
+
 type Order struct {
 	ID        	  primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	Pengguna    	Pengguna `bson:"pengguna,omitempty" json:"pengguna,omitempty"`
