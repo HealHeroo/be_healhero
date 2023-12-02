@@ -731,8 +731,8 @@ func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, inserted
 		return fmt.Errorf("mohon untuk melengkapi data")
 	}
 	data := bson.M{
-		"namaobat": insertedDoc.NamaObat,
-		"jenisobat": insertedDoc.JenisObat,
+		"nama_obat": insertedDoc.NamaObat,
+		"jenis_obat": insertedDoc.JenisObat,
 		"keterangan": insertedDoc.Keterangan,
 		"harga": insertedDoc.Harga,
 		
