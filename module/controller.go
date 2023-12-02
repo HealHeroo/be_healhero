@@ -770,17 +770,17 @@ func GetAllObat(db *mongo.Database) (obat []model.Obat, err error) {
 	return obat, nil
 }
 
-func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (obat []model.Obat, err error) {
+func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (doc []model.Obat, err error) {
 	collection := db.Collection("obat")
 	filter := bson.M{"_id": _id}
-	err = collection.FindOne(context.TODO(), filter).Decode(&obat)
+	err = collection.FindOne(context.TODO(), filter).Decode(&doc)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return obat, fmt.Errorf("no data found for ID %s", _id)
+			return doc, fmt.Errorf("no data found for ID %s", _id)
 		}
-		return obat, fmt.Errorf("error retrieving data for ID %s: %s", _id, err.Error())
+		return doc, fmt.Errorf("error retrieving data for ID %s: %s", _id, err.Error())
 	}
-	return obat, nil
+	return doc, nil
 }
 
 //order
