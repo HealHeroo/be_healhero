@@ -706,7 +706,7 @@ func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, inserted
 	}
 	obt := bson.M{
 		"nama_obat": insertedDoc.NamaObat,
-		"jenis-obat": insertedDoc.JenisObat,
+		"jenis_obat": insertedDoc.JenisObat,
 		"keterangan": insertedDoc.Keterangan,
 		"harga": insertedDoc.Harga,
 		

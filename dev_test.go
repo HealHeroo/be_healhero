@@ -282,7 +282,7 @@ func TestUpdateObat(t *testing.T) {
 		t.Errorf("Error role: %v", err)
 	}
 	var dataobat model.Obat
-	id := "656879cdd83eb5fac7049b27"
+	id := "655c3b9a1d6524f2f1200fc8"
 	objectId, _ := primitive.ObjectIDFromHex(id)
 	dataobat.NamaObat = "Marlina Lubis"
 	dataobat.JenisObat = "30/08/2003"
