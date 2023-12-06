@@ -353,7 +353,7 @@ func GCFHandlerInsertPengguna(MONGOCONNSTRINGENV, dbname string, r *http.Request
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = InsertPengguna(conn, datapengguna)
+	err = SignUpPengguna(conn, datapengguna)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
@@ -551,7 +551,7 @@ func GCFHandlerInsertDriver(MONGOCONNSTRINGENV, dbname string, r *http.Request) 
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = InsertDriver(conn, datadriver)
+	err = SignUpDriver(conn, datadriver)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
@@ -594,6 +594,36 @@ func GCFHandlerUpdateDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname strin
 	}
 	Response.Status = true
 	Response.Message = "Berhasil Update Driver"
+	return GCFReturnStruct(Response)
+}
+
+func GCFHandlerDeleteDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	tokenstring := r.Header.Get("Authorization")
+	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
+	if err != nil {
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Wrong parameter"
+		return GCFReturnStruct(Response)
+	}
+	idparam, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
+	}
+	err = DeleteDriver(idparam, payload.Id, conn)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Berhasil Delete Driver"
 	return GCFReturnStruct(Response)
 }
 
