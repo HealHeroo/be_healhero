@@ -2,12 +2,10 @@ package module
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/HealHeroo/be_healhero/model"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -344,6 +342,26 @@ func GCFHandlerGetAllUserByAdmin(conn *mongo.Database) string {
 //gadipake
 
 // pengguna
+
+func GCFHandlerInsertPengguna(MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	var datapengguna model.Pengguna
+	err := json.NewDecoder(r.Body).Decode(&datapengguna)
+	if err != nil {
+		Response.Message = "error parsing application/json: " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	err = SignUpPengguna(conn, datapengguna)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Halo " + datapengguna.NamaLengkap
+	return GCFReturnStruct(Response)
+}
 func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
@@ -380,7 +398,6 @@ func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname str
 	return GCFReturnStruct(Response)
 }
 
-
 func GCFHandlerDeletPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
@@ -410,38 +427,6 @@ func GCFHandlerDeletPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname stri
 	Response.Message = "Berhasil Delete Pengguna"
 	return GCFReturnStruct(Response)
 }
-
-
-//gadipake
-func GCFHandlerUpdateByPengguna(idparam, iduser primitive.ObjectID,  pengguna model.Pengguna, conn *mongo.Database, r *http.Request) string {
-	Response.Status = false
-	//
-	err := UpdatePengguna(idparam, iduser, conn, pengguna)
-	if err != nil {
-		Response.Message = err.Error()
-		return GCFReturnStruct(Response)
-	}
-	//
-	Response.Status = true
-	Response.Message = "Berhasil Update Pengguna"
-	return GCFReturnStruct(Response)
-}
-//gadipake
-
-// func GCFHandlerUpdateByAdmin(idparam primitive.ObjectID, pengguna model.Pengguna, conn *mongo.Database, r *http.Request) string {
-// 	Response.Status = false
-// 	//
-// 	err := UpdatePenggunaByAdmin(idparam, conn, pengguna)
-// 	if err != nil {
-// 		Response.Message = err.Error()
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	//
-// 	Response.Status = true
-// 	Response.Message = "Berhasil Update Data"
-// 	return GCFReturnStruct(Response)
-// }
-
 
 func GCFHandlerGetAllPengguna(MONGOCONNSTRINGENV, dbname string) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
@@ -478,9 +463,6 @@ func GCFHandlerGetPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string
 
 	return GCFReturnStruct(obat)
 }
-
-
-
 
 func GCFHandlerGetAllPenggunaByAdmin(conn *mongo.Database) string {
 	Response.Status = false
@@ -557,75 +539,42 @@ func GCFHandlerGetPenggunaByPengguna(iduser primitive.ObjectID, conn *mongo.Data
 //lupa
 
 // driver
-// func GCFHandlerUpdateDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
-// 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
-// 	var Response model.Response
-// 	Response.Status = false
-// 	tokenstring := r.Header.Get("Authorization")
-// 	payload, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
-// 	if err != nil {
-// 		Response.Message = "Gagal Decode Token : " + err.Error()
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	if payload.Role != "driver" {
-// 		Response.Message = "Anda tidak memiliki akses"
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	id := GetID(r)
-// 	if id == "" {
-// 		Response.Message = "Wrong parameter"
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	idparam, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		Response.Message = "Invalid id parameter"
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	var datadriver model.Driver
-// 	err = json.NewDecoder(r.Body).Decode(&datadriver)
-// 	if err != nil {
-// 		Response.Message = "error parsing application/json: " + err.Error()
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	err = UpdateDriver(idparam, payload.Id, conn, datadriver)
-// 	if err != nil {
-// 		Response.Message = err.Error()
-// 		return GCFReturnStruct(Response)
-// 	}
-// 	Response.Status = true
-// 	Response.Message = "Berhasil Update Driver"
-// 	return GCFReturnStruct(Response)
-// }
-
-//what ini
-func GCFHandlerUpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Driver) error {
-	driver, err := GetDriverFromAkun(iduser, db)
+func GCFHandlerUpdateDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	tokenstring := r.Header.Get("Authorization")
+	user_login, err := Decode(os.Getenv(PASETOPUBLICKEYENV), tokenstring)
 	if err != nil {
-		return err
+		Response.Message = "Gagal Decode Token : " + err.Error()
+		return GCFReturnStruct(Response)
 	}
-	if driver.ID != idparam {
-		return fmt.Errorf("kamu bukan pemilik data ini")
+	id := GetID(r)
+	if id == "" {
+		Response.Message = "Wrong parameter"
+		return GCFReturnStruct(Response)
 	}
-	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == ""  {
-		return fmt.Errorf("mohon untuk melengkapi data")
-	}
-	mtr := bson.M{
-		"namalengkap": 		insertedDoc.NamaLengkap,
-		"jeniskelamin": 	insertedDoc.JenisKelamin,
-		"nomorhp":          insertedDoc.NomorHP,
-		"alamat":     	 	insertedDoc.Alamat,
-		"platmotor": 		insertedDoc.PlatMotor,
-		"akun": model.User{
-			ID: driver.Akun.ID,
-		},
-	}
-	err = UpdateOneDoc(idparam, db, "driver", mtr)
+	idparam, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		Response.Message = "Invalid id parameter"
+		return GCFReturnStruct(Response)
 	}
-	return nil
+	var datadriver model.Driver
+	err = json.NewDecoder(r.Body).Decode(&datadriver)
+	if err != nil {
+		Response.Message = "error parsing application/json: " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	err = UpdateDriver(idparam, user_login.Id, conn, datadriver)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Berhasil Update Driver"
+	return GCFReturnStruct(Response)
 }
-//what ini
+
 
 func GCFHandlerGetDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)

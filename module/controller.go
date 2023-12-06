@@ -1,58 +1,3 @@
-// package module
-
-// import (
-// 	"encoding/json"
-// 	"net/http"
-// 	"os"
-// 	"github.com/aiteung/atdb"
-// 	"github.com/whatsauth/watoken"
-// 	"go.mongodb.org/mongo-driver/mongo"
-// )
-
-// // func GCFHandler(MONGOCONNSTRINGENV, dbname, collectionname string) string {
-// // 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
-// // 	datagedung := GetAllBangunanLineString(mconn, collectionname)
-// // 	return GCFReturnStruct(datagedung)
-// // }
-
-// func GCFPostHandler(PASETOPRIVATEKEYENV, MONGOCONNSTRINGENV, dbname, collectionname string, r *http.Request) string {
-// 	var Response Credential
-// 	Response.Status = false
-// 	mconn := SetConnection(MONGOCONNSTRINGENV, dbname)
-// 	var datauser User
-// 	err := json.NewDecoder(r.Body).Decode(&datauser)
-// 	if err != nil {
-// 		Response.Message = "error parsing application/json: " + err.Error()
-// 	} else {
-// 		if IsPasswordValid(mconn, collectionname, datauser) {
-// 			Response.Status = true
-// 			tokenstring, err := watoken.Encode(datauser.Username, os.Getenv(PASETOPRIVATEKEYENV))
-// 			if err != nil {
-// 				Response.Message = "Gagal Encode Token : " + err.Error()
-// 			} else {
-// 				Response.Message = "Selamat Datang"
-// 				Response.Token = tokenstring
-// 			}
-// 		} else {
-// 			Response.Message = "Password Salah"
-// 		}
-// 	}
-
-// 	return GCFReturnStruct(Response)
-// }
-
-// func GCFReturnStruct(DataStuct any) string {
-// 	jsondata, _ := json.Marshal(DataStuct)
-// 	return string(jsondata)
-// }
-
-// func InsertUser(db *mongo.Database, collection string, userdata User) string {
-// 	hash, _ := HashPassword(userdata.Password)
-// 	userdata.Password = hash
-// 	atdb.InsertOneDoc(db, collection, userdata)
-// 	return "Ini username : " + userdata.Username + "ini password : " + userdata.Password
-// }
-
 package module
 
 import (
@@ -292,46 +237,6 @@ func UpdateEmailUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc 
 	return nil
 }
 
-// func UpdateUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.User) error {
-// 	dataUser, err := GetUserFromID(iduser, db)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if insertedDoc.Email == "" || insertedDoc.Password == "" {
-// 		return fmt.Errorf("Dimohon untuk melengkapi data")
-// 	}
-// 	if err = checkmail.ValidateFormat(insertedDoc.Email); err != nil {
-// 		return fmt.Errorf("Email tidak valid")
-// 	}
-// 	existsDoc, _ := GetUserFromEmail(insertedDoc.Email, db)
-// 	if existsDoc.Email == insertedDoc.Email {
-// 		return fmt.Errorf("Email sudah terdaftar")
-// 	}
-// 	if strings.Contains(insertedDoc.Password, " ") {
-// 		return fmt.Errorf("password tidak boleh mengandung spasi")
-// 	}
-// 	if len(insertedDoc.Password) < 8 {
-// 		return fmt.Errorf("password terlalu pendek")
-// 	}
-// 	salt := make([]byte, 16)
-// 	_, err = rand.Read(salt)
-// 	if err != nil {
-// 		return fmt.Errorf("kesalahan server : salt")
-// 	}
-// 	hashedPassword := argon2.IDKey([]byte(insertedDoc.Password), salt, 1, 64*1024, 4, 32)
-// 	user := bson.M{
-// 		"email": insertedDoc.Email,
-// 		"password": hex.EncodeToString(hashedPassword),
-// 		"salt": hex.EncodeToString(salt),
-// 		"role": dataUser.Role,
-// 	}
-// 	err = UpdateOneDoc(iduser, db, "user", user)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
-
 func UpdatePasswordUser(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Password) error {
 	dataUser, err := GetUserFromID(iduser, db)
 	if err != nil {
@@ -450,6 +355,57 @@ func GetUserFromEmail(email string, db *mongo.Database) (doc model.User, err err
 }
 
 // pengguna
+func InsertPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
+	objectId := primitive.NewObjectID() 
+	if insertedDoc.NamaLengkap == "" || insertedDoc.TanggalLahir == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
+		return fmt.Errorf("Dimohon untuk melengkapi data")
+	} 
+	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
+		return fmt.Errorf("Email tidak valid")
+	} 
+	userExists, _ := GetUserFromEmail(insertedDoc.Akun.Email, db)
+	if insertedDoc.Akun.Email == userExists.Email {
+		return fmt.Errorf("Email sudah terdaftar")
+	} 
+	if strings.Contains(insertedDoc.Akun.Password, " ") {
+		return fmt.Errorf("password tidak boleh mengandung spasi")
+	}
+	if len(insertedDoc.Akun.Password) < 8 {
+		return fmt.Errorf("password terlalu pendek")
+	} 
+	salt := make([]byte, 16)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return fmt.Errorf("kesalahan server : salt")
+	}
+	hashedPassword := argon2.IDKey([]byte(insertedDoc.Akun.Password), salt, 1, 64*1024, 4, 32)
+	user := bson.M{
+		"_id": objectId,
+		"email": insertedDoc.Akun.Email,
+		"password": hex.EncodeToString(hashedPassword),
+		"salt": hex.EncodeToString(salt),
+		"role": "pengguna",
+	}
+	pengguna := bson.M{
+		"namalengkap": insertedDoc.NamaLengkap,
+		"tanggallahir": insertedDoc.TanggalLahir,
+		"jeniskelamin": insertedDoc.JenisKelamin,
+		"nomorhp": insertedDoc.NomorHP,
+		"alamat": insertedDoc.Alamat,
+		"akun": model.User {
+			ID : objectId,
+		},
+	}
+	_, err = InsertOneDoc(db, "user", user)
+	if err != nil {
+		return fmt.Errorf("kesalahan server")
+	}
+	_, err = InsertOneDoc(db, "pengguna", pengguna)
+	if err != nil {
+		return fmt.Errorf("kesalahan server")
+	}
+	return nil
+}
 func UpdatePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Pengguna) error {
 	pengguna, err := GetPenggunaFromAkun(iduser, db)
 	if err != nil {
@@ -591,17 +547,64 @@ func GetDriverFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (dri
 	return driver, nil
 }
 
-
-
-
 // driver
-func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Driver) error {
-	driver, err := GetDriverFromAkun(iduser, db)
+
+func InsertDriver(db *mongo.Database, insertedDoc model.Driver) error {
+	objectId := primitive.NewObjectID()
+	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == "" ||  insertedDoc.Akun.Email == "" || insertedDoc.Akun.Password == "" {
+		return fmt.Errorf("Dimohon untuk melengkapi data")
+	} 
+	if err := checkmail.ValidateFormat(insertedDoc.Akun.Email); err != nil {
+		return fmt.Errorf("Email tidak valid")
+	} 
+	userExists, _ := GetUserFromEmail(insertedDoc.Akun.Email, db)
+	if insertedDoc.Akun.Email == userExists.Email {
+		return fmt.Errorf("Email sudah terdaftar")
+	} 
+	if strings.Contains(insertedDoc.Akun.Password, " ") {
+		return fmt.Errorf("Password tidak boleh mengandung spasi")
+	}
+	if len(insertedDoc.Akun.Password) < 8 {
+		return fmt.Errorf("Password terlalu pendek")
+	}
+	salt := make([]byte, 16)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return fmt.Errorf("kesalahan server : salt")
+	}
+	hashedPassword := argon2.IDKey([]byte(insertedDoc.Akun.Password), salt, 1, 64*1024, 4, 32)
+	user := bson.M{
+		"_id": objectId,
+		"email": insertedDoc.Akun.Email,
+		"password": hex.EncodeToString(hashedPassword),
+		"salt": hex.EncodeToString(salt),
+		"role": "driver",
+	}
+	driver := bson.M{
+		"namalengkap": insertedDoc.NamaLengkap,
+		"jeniskelamin": insertedDoc.JenisKelamin,
+		"nomorhp": insertedDoc.NomorHP,
+		"alamat": insertedDoc.Alamat,
+		"platmotor": insertedDoc.PlatMotor,
+		"akun": model.User {
+			ID : objectId,
+		},
+	}
+	_, err = InsertOneDoc(db, "user", user)
 	if err != nil {
 		return err
 	}
-	if driver.ID != idparam {
-		return fmt.Errorf("anda bukan pemilik data ini")
+	_, err = InsertOneDoc(db, "driver", driver)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Driver) error {
+	_, err := GetDriverFromID(idparam, db)
+	if err != nil {
+		return err
 	}
 	if insertedDoc.NamaLengkap == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == "" || insertedDoc.PlatMotor == ""{
 		return fmt.Errorf("dimohon untuk melengkapi data")
@@ -616,7 +619,21 @@ func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insert
 			ID : driver.Akun.ID,
 		},
 	}
+
 	err = UpdateOneDoc(idparam, db, "driver", drv)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+func DeleteDriver(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
+	_, err := GetDriverFromID(idparam, db)
+	if err != nil {
+		return err
+	}
+	err = DeleteOneDoc(idparam, db, "driver")
 	if err != nil {
 		return err
 	}
