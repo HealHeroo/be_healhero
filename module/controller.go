@@ -439,7 +439,7 @@ func DeletePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database) erro
 	if err != nil {
 		return err
 	}
-	err = DeleteOneDoc(idparam, db, "obat")
+	err = DeleteOneDoc(idparam, db, "pengguna")
 	if err != nil {
 		return err
 	}
@@ -472,6 +472,7 @@ func GetPenggunaFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Pe
 	}
 	return doc, nil
 }
+
 
 func GetPenggunaFromAkun(akun primitive.ObjectID, db *mongo.Database) (doc model.Pengguna, err error) {
 	collection := db.Collection("pengguna")

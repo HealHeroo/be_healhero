@@ -419,7 +419,7 @@ func GCFHandlerDeletePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname str
 		Response.Message = "Invalid id parameter"
 		return GCFReturnStruct(Response)
 	}
-	err = DeleteObat(idparam, payload.Id, conn)
+	err = DeletePengguna(idparam, payload.Id, conn)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
