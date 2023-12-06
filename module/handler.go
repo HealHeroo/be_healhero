@@ -353,7 +353,7 @@ func GCFHandlerInsertPengguna(MONGOCONNSTRINGENV, dbname string, r *http.Request
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	err = SignUpPengguna(conn, datapengguna)
+	err = InsertPengguna(conn, datapengguna)
 	if err != nil {
 		Response.Message = err.Error()
 		return GCFReturnStruct(Response)
@@ -362,6 +362,7 @@ func GCFHandlerInsertPengguna(MONGOCONNSTRINGENV, dbname string, r *http.Request
 	Response.Message = "Halo " + datapengguna.NamaLengkap
 	return GCFReturnStruct(Response)
 }
+
 func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
@@ -539,6 +540,27 @@ func GCFHandlerGetPenggunaByPengguna(iduser primitive.ObjectID, conn *mongo.Data
 //lupa
 
 // driver
+
+func GCFHandlerInsertDriver(MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	var Response model.Response
+	Response.Status = false
+	var datadriver model.Driver
+	err := json.NewDecoder(r.Body).Decode(&datadriver)
+	if err != nil {
+		Response.Message = "error parsing application/json: " + err.Error()
+		return GCFReturnStruct(Response)
+	}
+	err = InsertDriver(conn, datadriver)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+	Response.Status = true
+	Response.Message = "Halo " + datadriver.NamaLengkap
+	return GCFReturnStruct(Response)
+}
+
 func GCFHandlerUpdateDriver(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
