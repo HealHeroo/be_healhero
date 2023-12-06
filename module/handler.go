@@ -398,7 +398,7 @@ func GCFHandlerUpdatePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname str
 	return GCFReturnStruct(Response)
 }
 
-func GCFHandlerDeletPengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
+func GCFHandlerDeletePengguna(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname string, r *http.Request) string {
 	conn := MongoConnect(MONGOCONNSTRINGENV, dbname)
 	var Response model.Response
 	Response.Status = false
