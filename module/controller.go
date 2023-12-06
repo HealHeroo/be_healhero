@@ -478,6 +478,18 @@ func UpdatePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database, inse
 	return nil
 }
 
+func DeletePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
+	_, err := GetPenggunaFromID(idparam, db)
+	if err != nil {
+		return err
+	}
+	err = DeleteOneDoc(idparam, db, "obat")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetAllPengguna(db *mongo.Database) (pengguna []model.Pengguna, err error) {
 	collection := db.Collection("pengguna")
 	filter := bson.M{}
@@ -517,6 +529,8 @@ func GetPenggunaFromAkun(akun primitive.ObjectID, db *mongo.Database) (doc model
 	}
 	return doc, nil
 }
+
+
 
 //by admin
 func GetPenggunaFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (pengguna model.Pengguna, err error) {
@@ -577,33 +591,7 @@ func GetDriverFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (dri
 	return driver, nil
 }
 
-// func GetAllDriverByAdmin(db *mongo.Database) (driver model.Driver, err error) {
-// 	collection := db.Collection("driver")
-// 	filter := bson.M{}
-// 	cursor, err := collection.Find(context.Background(), filter)
-// 	if err != nil {
-// 		return driver, err
-// 	}
-// 	err = cursor.All(context.Background(), &driver)
-// 	if err != nil {
-// 		return driver, err
-// 	}
-// 	for _, m := range driver {
-// 		user, err := GetUserFromID(m.Akun.ID, db)
-// 		if err != nil {
-// 			return driver, err
-// 		}
-// 		akun := model.User{
-// 			ID:    user.ID,
-// 			Email: user.Email,
-// 			Role:  user.Role,
-// 		}
-// 		m.Akun = akun
-// 		driver = append(driver, m)
-// 		driver = driver[1:]
-// 	}
-// 	return driver, nil
-// }
+
 
 
 // driver
@@ -719,30 +707,6 @@ func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, inserted
 	return nil
 }
 
-// func UpdateObat(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Obat) error {
-// 	obat, err :=GetObatFromID(iduser, db)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if obat.ID != idparam {
-// 		return fmt.Errorf("kamu bukan pemilik data ini")
-// 	}
-// 	if insertedDoc.NamaObat == "" || insertedDoc.JenisObat == ""|| insertedDoc.Keterangan == "" || insertedDoc.Harga == ""   {
-// 		return fmt.Errorf("mohon untuk melengkapi data")
-// 	}
-// 	data := bson.M{
-// 		"nama_obat": insertedDoc.NamaObat,
-// 		"jenis_obat": insertedDoc.JenisObat,
-// 		"keterangan": insertedDoc.Keterangan,
-// 		"harga": insertedDoc.Harga,
-		
-// 	}
-// 	err = UpdateOneDoc(idparam, db, "obat", data)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
 
 func DeleteObat(idparam, iduser primitive.ObjectID, db *mongo.Database) error {
 	_, err := GetObatFromID(idparam, db)
