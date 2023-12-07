@@ -526,6 +526,34 @@ func GetAllPenggunaByAdmin(db *mongo.Database) (pengguna []model.Pengguna, err e
 	return pengguna, nil
 }
 
+func UpdatePenggunaByAdmin(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Pengguna) error {
+	pengguna, err := GetPenggunaFromAkun(iduser, db)
+	if err != nil {
+		return err
+	}
+	if pengguna.ID != idparam {
+		return fmt.Errorf("Anda bukan pemilik data ini")
+	}
+	if insertedDoc.NamaLengkap == "" || insertedDoc.TanggalLahir == "" || insertedDoc.JenisKelamin == "" || insertedDoc.NomorHP == "" || insertedDoc.Alamat == ""{
+		return fmt.Errorf("Dimohon untuk melengkapi data")
+	} 
+	pgn := bson.M{
+		"namalengkap": insertedDoc.NamaLengkap,
+		"tanggallahir": insertedDoc.TanggalLahir,
+		"jeniskelamin": insertedDoc.JenisKelamin,
+		"nomorhp": insertedDoc.NomorHP,
+		"alamat": insertedDoc.Alamat,
+		"akun": model.User {
+			ID : pengguna.Akun.ID,
+		},
+	}
+	err = UpdateOneDoc(idparam, db, "pengguna", pgn)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetDriverFromIDByAdmin(idparam primitive.ObjectID, db *mongo.Database) (driver model.Driver, err error) {
 	collection := db.Collection("driver")
 	filter := bson.M{
