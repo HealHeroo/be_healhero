@@ -895,7 +895,7 @@ func DeletePesanan(idparam, iduser primitive.ObjectID, db *mongo.Database) error
 	if err != nil {
 		return err
 	}
-	err = DeleteOneDoc(idparam, db, "obat")
+	err = DeleteOneDoc(idparam, db, "pesanan")
 	if err != nil {
 		return err
 	}
