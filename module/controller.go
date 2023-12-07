@@ -644,16 +644,17 @@ func DeleteDriver(idparam, iduser primitive.ObjectID, db *mongo.Database) error 
 func GetAllDriver(db *mongo.Database) (driver []model.Driver, err error) {
 	collection := db.Collection("driver")
 	filter := bson.M{}
-	cursor, err := collection.Find(context.Background(), filter)
+	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		return driver, fmt.Errorf("error GetAllDriver mongo: %s", err)
 	}
-	err = cursor.All(context.Background(), &driver)
+	err = cursor.All(context.TODO(), &driver)
 	if err != nil {
 		return driver, fmt.Errorf("error GetAllDriver context: %s", err)
 	}
 	return driver, nil
 }
+
 
 func GetDriverFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Driver, err error) {
 	collection := db.Collection("driver")
