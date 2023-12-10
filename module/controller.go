@@ -672,11 +672,11 @@ func DeleteDriver(idparam, iduser primitive.ObjectID, db *mongo.Database) error 
 func GetAllDriver(db *mongo.Database) (driver []model.Driver, err error) {
 	collection := db.Collection("driver")
 	filter := bson.M{}
-	cursor, err := collection.Find(context.TODO(), filter)
+	cursor, err := collection.Find(context.Background(), filter)
 	if err != nil {
 		return driver, fmt.Errorf("error GetAllDriver mongo: %s", err)
 	}
-	err = cursor.All(context.TODO(), &driver)
+	err = cursor.All(context.Background(), &driver)
 	if err != nil {
 		return driver, fmt.Errorf("error GetAllDriver context: %s", err)
 	}
@@ -692,7 +692,7 @@ func GetDriverFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Driv
 		if err == mongo.ErrNoDocuments {
 			return doc, fmt.Errorf("_id tidak ditemukan")
 		}
-		return doc, fmt.Errorf("kesalahan server")
+		return doc, fmt.Errorf("error retrieving data for ID %s: %s", _id, err.Error())
 	}
 	return doc, nil
 }
