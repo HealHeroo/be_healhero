@@ -423,9 +423,9 @@ func UpdatePengguna(idparam, iduser primitive.ObjectID, db *mongo.Database, inse
 		"jeniskelamin": insertedDoc.JenisKelamin,
 		"nomorhp": insertedDoc.NomorHP,
 		"alamat": insertedDoc.Alamat,
-		"akun": model.User {
-			ID : pengguna.Akun.ID,
-		},
+		// "akun": model.User {
+		// 	ID : pengguna.Akun.ID,
+		// },
 	}
 	err = UpdateOneDoc(idparam, db, "pengguna", pgn)
 	if err != nil {
@@ -543,9 +543,9 @@ func UpdatePenggunaByAdmin(idparam, iduser primitive.ObjectID, db *mongo.Databas
 		"jeniskelamin": insertedDoc.JenisKelamin,
 		"nomorhp": insertedDoc.NomorHP,
 		"alamat": insertedDoc.Alamat,
-		"akun": model.User {
-			ID : pengguna.Akun.ID,
-		},
+		// "akun": model.User {
+		// 	ID : pengguna.Akun.ID,
+		// },
 	}
 	err = UpdateOneDoc(idparam, db, "pengguna", pgn)
 	if err != nil {
@@ -644,9 +644,9 @@ func UpdateDriver(idparam, iduser primitive.ObjectID, db *mongo.Database, insert
 		"nomorhp": insertedDoc.NomorHP,
 		"alamat": insertedDoc.Alamat,
 		"platmotor": insertedDoc.PlatMotor,
-		"akun": model.User {
-			ID : driver.Akun.ID,
-		},
+		// "akun": model.User {
+		// 	ID : driver.Akun.ID,
+		// },
 	}
 
 	err = UpdateOneDoc(idparam, db, "driver", drv)
