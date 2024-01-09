@@ -1109,25 +1109,15 @@ func GCFHandlerInsertPesanan(PASETOPUBLICKEYENV, MONGOCONNSTRINGENV, dbname stri
 		Response.Message = "error parsing application/json: " + err.Error()
 		return GCFReturnStruct(Response)
 	}
-	id := GetID(r)
-	if id == "" {
-		Response.Message = "Wrong parameter"
-		return GCFReturnStruct(Response)
-	}
+	err = InsertPesanan(payload.Id, conn, datapesanan)
+    if err != nil {
+        Response.Message = err.Error()
+        return GCFReturnStruct(Response)
+    }
+    Response.Status = true
+    Response.Message = "Berhasil Insert Pesanan"
+    return GCFReturnStruct(Response)
 
-	idParam, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		Response.Message = "Invalid ID parameter"
-		return GCFReturnStruct(Response)
-	}
-	err = InsertPesanan(idParam, payload.Id, conn, datapesanan)
-	if err != nil {
-		Response.Message = err.Error()
-		return GCFReturnStruct(Response)
-	}
-	Response.Status = true
-	Response.Message = "Berhasil Insert Pesanan"
-	return GCFReturnStruct(Response)
 }
 
 

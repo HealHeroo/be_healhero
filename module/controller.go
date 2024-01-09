@@ -894,7 +894,7 @@ func GetAllOrder(db *mongo.Database) (order []model.Order, err error) {
 
 //pesanan 
 
-func InsertPesanan(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Pesanan) error {
+func InsertPesanan(iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Pesanan) error {
 
 	if insertedDoc.Nama == "" || insertedDoc.Alamat == "" || insertedDoc.NomorHP == "" || insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.Harga == "" || insertedDoc.TotalHarga == ""|| insertedDoc.Status == ""{
 		return fmt.Errorf("harap lengkapi semua data pesanan")
