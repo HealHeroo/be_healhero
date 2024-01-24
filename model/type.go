@@ -100,6 +100,7 @@ type Credential struct {
 	Token   string `json:"token,omitempty" bson:"token,omitempty"`
 	Message string `json:"message,omitempty" bson:"message,omitempty"`
 	Role	string `json:"role,omitempty" bson:"role,omitempty"`
+	Data    []User `bson:"data,omitempty" json:"data,omitempty"`
 }
 
 type Response struct {

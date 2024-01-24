@@ -1,12 +1,15 @@
 package module
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/HealHeroo/be_healhero/model"
@@ -93,6 +96,10 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 	if insertedDoc.Akun.Email == userExists.Email {
 		return fmt.Errorf("Email sudah terdaftar")
 	} 
+	isValid, _ := ValidatePhoneNumber(insertedDoc.NomorHP)
+	if !isValid {
+		return fmt.Errorf("Nomor telepon tidak valid")
+	}
 	if strings.Contains(insertedDoc.Akun.Password, " ") {
 		return fmt.Errorf("password tidak boleh mengandung spasi")
 	}
@@ -132,6 +139,36 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 	}
 	return nil
 }
+
+func ValidatePhoneNumber(phoneNumber string) (bool, error) {
+	// Define the regular expression pattern for numeric characters
+	numericPattern := `^[0-9]+$`
+
+	// Compile the numeric pattern
+	numericRegexp, err := regexp.Compile(numericPattern)
+	if err != nil {
+		return false, err
+	}
+	// Check if the phone number consists only of numeric characters
+	if !numericRegexp.MatchString(phoneNumber) {
+		return false, nil
+	}
+
+	// Define the regular expression pattern for "62" followed by 6 to 12 digits
+	pattern := `^62\d{6,13}$`
+
+	// Compile the regular expression
+	regexpPattern, err := regexp.Compile(pattern)
+	if err != nil {
+		return false, err
+	}
+
+	// Test if the phone number matches the pattern
+	isValid := regexpPattern.MatchString(phoneNumber)
+
+	return isValid, nil
+}
+
 
 func SignUpDriver(db *mongo.Database, insertedDoc model.Driver) error {
 	objectId := primitive.NewObjectID()
@@ -796,6 +833,66 @@ func GetObatFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Obat, 
 
 //order
 
+// func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
+
+// 	if insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.TotalCost == "" || insertedDoc.Status == "" {
+// 		return fmt.Errorf("harap lengkapi semua data order")
+// 	}
+
+// 	ord := bson.M{
+// 		"pengguna": bson.M{
+// 			"_id" : iduser,
+// 			"namalengkap" : iduser,
+// 		},
+// 		"driver": bson.M{
+// 			"_id" : insertedDoc.Driver.ID,
+// 		},
+// 		"obat": bson.M{
+// 			"_id" : idparam,
+// 			"nama_obat" : idparam,
+// 		},
+// 		"namaobat":    insertedDoc.NamaObat,
+// 		"quantity":    insertedDoc.Quantity,
+// 		"total_cost":   insertedDoc.TotalCost,
+// 		"status":   insertedDoc.Status,
+// 	}
+
+// 	_, err := InsertOneDoc(db, "order", ord)
+// 	if err != nil {
+// 		return fmt.Errorf("error saat menyimpan data order: %s", err)
+// 	}
+// 	return nil
+// }
+
+// func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
+
+// 	if insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.TotalCost == "" || insertedDoc.Status == "" {
+// 		return fmt.Errorf("harap lengkapi semua data order")
+// 	}
+
+// 	ord := bson.M{
+// 		"pengguna": bson.M{
+// 			"_id" : pengguna.ID,
+// 		},
+// 		"driver": bson.M{
+// 			"_id" : insertedDoc.Driver.ID,
+// 		},
+// 		"obat": bson.M{
+// 			"_id" : obat.ID,
+	
+// 		},
+// 		"namaobat":    insertedDoc.NamaObat,
+// 		"quantity":    insertedDoc.Quantity,
+// 		"total_cost":   insertedDoc.TotalCost,
+// 		"status":   insertedDoc.Status,
+// 	}
+
+// 	_, err := InsertOneDoc(db, "order", ord)
+// 	if err != nil {
+// 		return fmt.Errorf("error saat menyimpan data order: %s", err)
+// 	}
+// 	return nil
+// }
 func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, insertedDoc model.Order) error {
 
 	if insertedDoc.NamaObat == "" || insertedDoc.Quantity == "" || insertedDoc.TotalCost == "" || insertedDoc.Status == "" {
@@ -804,20 +901,20 @@ func InsertOrder(idparam, iduser primitive.ObjectID, db *mongo.Database, inserte
 
 	ord := bson.M{
 		"pengguna": bson.M{
-			"_id" : iduser,
-			"namalengkap" : iduser,
+			"namapengguna": insertedDoc.Pengguna.NamaLengkap,
+			"alamat":       insertedDoc.Pengguna.Alamat,
+			"nohp":         insertedDoc.Pengguna.NomorHP,
 		},
 		"driver": bson.M{
-			"_id" : insertedDoc.Driver.ID,
+			"namadriver": insertedDoc.Driver.NamaLengkap,
 		},
 		"obat": bson.M{
-			"_id" : idparam,
-			"nama_obat" : idparam,
+			"namaobat": insertedDoc.Obat.NamaObat,
 		},
-		"namaobat":    insertedDoc.NamaObat,
-		"quantity":    insertedDoc.Quantity,
-		"total_cost":   insertedDoc.TotalCost,
-		"status":   insertedDoc.Status,
+		"namaobat":   insertedDoc.NamaObat,
+		"quantity":   insertedDoc.Quantity,
+		"total_cost": insertedDoc.TotalCost,
+		"status":     insertedDoc.Status,
 	}
 
 	_, err := InsertOneDoc(db, "order", ord)
@@ -962,6 +1059,58 @@ func GetPesananFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Pes
 	return doc, nil
 }
 
+//sendwhatsapp
+func SendWhatsAppConfirmation(username, phonenumber string) error {
+	url := "https://api.wa.my.id/api/send/message/text"
+
+	// Data yang akan dikirimkan dalam format JSON
+	jsonStr := []byte(`{
+        "to": "` + phonenumber + `",
+        "isgroup": false,
+        "messages": "Hello ` + username + `!!! ˗ˏˋ ♡ ˎˊ˗\nTerima kasih telah melakukan Registrasi akun di HealHeroo, silakan login atau tekan link dibawah ini untuk melanjutkan.\n⬇ ⬇ ⬇ ⬇ ⬇ \nhttps://healhero.my.id/signin.html"
+    }`)
+
+	// Membuat permintaan HTTP POST
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return err
+	}
+
+	// Menambahkan header ke permintaan
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Token", "v4.public.eyJleHAiOiIyMDI0LTAyLTIxVDA3OjU0OjE1WiIsImlhdCI6IjIwMjQtMDEtMjJUMDc6NTQ6MTVaIiwiaWQiOiI2Mjg3ODg4MjE3MjgzIiwibmJmIjoiMjAyNC0wMS0yMlQwNzo1NDoxNVoifUupI4YPhWvgD5clft5bC0ExZM1aBiXZeCmqzo59Fiy2wCiNv7_Tb9i3hI7q2XC2drt9ULJp24csATsTXXcDBgY")
+	// req.Header.Set("Token", "v4.public.eyJleHAiOiIyMDI0LTAyLTE5VDIxOjA3OjM2WiIsImlhdCI6IjIwMjQtMDEtMjBUMjE6MDc6MzZaIiwiaWQiOiI2MjgyMzE3MTUwNjgxIiwibmJmIjoiMjAyNC0wMS0yMFQyMTowNzozNloiff1YQuHHPwSzGpisAMb9rTLP58-jCqtByzePJACBLghprkq2HXtTSbVTShc49m3GIVkU42VSl8uSGme8c4vXnQc")
+	req.Header.Set("Content-Type", "application/json")
+
+	// Melakukan permintaan HTTP POST
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Menampilkan respons dari server
+	fmt.Println("Response Status:", resp.Status)
+
+	return nil
+}
+
+func GetUserFromToken(db *mongo.Database, col string, _id primitive.ObjectID) (user model.User, err error) {
+	cols := db.Collection(col)
+	filter := bson.M{"_id": _id}
+
+	err = cols.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			fmt.Println("no data found for ID", _id)
+		} else {
+			fmt.Println("error retrieving data for ID", _id, ":", err.Error())
+		}
+	}
+
+	return user, nil
+}
 
 // func GetOrderByAdmin(db *mongo.Database) (order []model.Order, err error) {
 // 	collection := db.Collection("order")

@@ -6,12 +6,13 @@ import (
 	"os"
 
 	"github.com/HealHeroo/be_healhero/model"
+	"github.com/whatsauth/watoken"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
-	Response model.Response
+	Response model.Credential
 	user model.User
 	pengguna model.Pengguna
 	driver model.Driver
@@ -59,6 +60,43 @@ func GCFHandlerSignUpDriver(MONGOCONNSTRINGENV, dbname string, r *http.Request) 
 	}
 	Response.Status = true
 	Response.Message = "Halo " + datadriver.NamaLengkap
+	return GCFReturnStruct(Response)
+}
+
+//token
+func GCFHandlerGetUserFromToken(PASETOPUBLICKEY, MONGOCONNSTRINGENV, dbname, collectionname string, r *http.Request) string {
+	mconn := MongoConnect(MONGOCONNSTRINGENV, dbname)
+	Response.Status = false
+
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		Response.Message = "error parsing application/json1:"
+		return GCFReturnStruct(Response)
+	}
+
+	userInfo, err := watoken.Decode(os.Getenv(PASETOPUBLICKEY), token)
+	if err != nil {
+		Response.Message = "error parsing application/json2:" + err.Error() + ";" + token
+		return GCFReturnStruct(Response)
+	}
+
+	// Konversi string ke primitive.ObjectID
+	userID, err := primitive.ObjectIDFromHex(userInfo.Id)
+	if err != nil {
+		Response.Message = "error converting userID:" + err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	user, err := GetUserFromToken(mconn, collectionname, userID)
+	if err != nil {
+		Response.Message = err.Error()
+		return GCFReturnStruct(Response)
+	}
+
+	Response.Status = true
+	Response.Message = "Hello user"
+	Response.Data = []model.User{user}
+
 	return GCFReturnStruct(Response)
 }
 

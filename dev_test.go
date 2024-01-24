@@ -26,6 +26,18 @@ func TestGetUserFromEmail(t *testing.T) {
 	}
 }
 
+func TestSendWhatsAppConfirmation(t *testing.T) {
+	username := "Rizkyria Hutabarat"
+	phonenumber := "6281219882869"
+
+	err := module.SendWhatsAppConfirmation(username, phonenumber)
+	if err != nil {
+		t.Errorf("Error sending whatsapp: %v", err)
+	} else {
+		fmt.Println("Send whatsapp success")
+	}
+}
+
 func TestInsertOneObat(t *testing.T) {
 	var doc model.Obat
    doc.NamaObat= "Paracetamol"
