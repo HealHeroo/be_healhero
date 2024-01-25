@@ -27,10 +27,10 @@ func TestGetUserFromEmail(t *testing.T) {
 }
 
 func TestSendWhatsAppConfirmation(t *testing.T) {
-	namalengkap := "Juwita"
-	phonenumber := "6281260911992"
+	namalengkap := "Rizkyria"
+	nomorhp := "6281219882869"
 
-	err := module.SendWhatsAppConfirmation(namalengkap, phonenumber)
+	err := module.SendWhatsAppConfirmation(namalengkap, nomorhp)
 	if err != nil {
 		t.Errorf("Error sending whatsapp: %v", err)
 	} else {
