@@ -137,6 +137,11 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 	if err != nil {
 		return fmt.Errorf("kesalahan server")
 	}
+	// Send whatsapp confirmation
+	err = SendWhatsAppConfirmation(insertedDoc.NamaLengkap, insertedDoc.NomorHP)
+	if err != nil {
+		return fmt.Errorf("SendWhatsAppConfirmation: %v", err)
+	}
 	return nil
 }
 
@@ -1078,7 +1083,7 @@ func SendWhatsAppConfirmation(username, phonenumber string) error {
 
 	// Menambahkan header ke permintaan
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Token", "v4.public.eyJleHAiOiIyMDI0LTAyLTIxVDA3OjU0OjE1WiIsImlhdCI6IjIwMjQtMDEtMjJUMDc6NTQ6MTVaIiwiaWQiOiI2Mjg3ODg4MjE3MjgzIiwibmJmIjoiMjAyNC0wMS0yMlQwNzo1NDoxNVoifUupI4YPhWvgD5clft5bC0ExZM1aBiXZeCmqzo59Fiy2wCiNv7_Tb9i3hI7q2XC2drt9ULJp24csATsTXXcDBgY")
+	req.Header.Set("Token", "v4.public.eyJleHAiOiIyMDI0LTAyLTIzVDE1OjA1OjI3WiIsImlhdCI6IjIwMjQtMDEtMjRUMTU6MDU6MjdaIiwiaWQiOiI2Mjg5NTgwNjg0NDU1NCIsIm5iZiI6IjIwMjQtMDEtMjRUMTU6MDU6MjdaIn2rLHTLg6rDPzKgKR4wr_smlabvVARrT-iXzbUDlp-fPfapNnPRf5_8mxqz9DnwMp_fQ5KJ5q8sPfLPB_VZSpAD")
 	// req.Header.Set("Token", "v4.public.eyJleHAiOiIyMDI0LTAyLTE5VDIxOjA3OjM2WiIsImlhdCI6IjIwMjQtMDEtMjBUMjE6MDc6MzZaIiwiaWQiOiI2MjgyMzE3MTUwNjgxIiwibmJmIjoiMjAyNC0wMS0yMFQyMTowNzozNloiff1YQuHHPwSzGpisAMb9rTLP58-jCqtByzePJACBLghprkq2HXtTSbVTShc49m3GIVkU42VSl8uSGme8c4vXnQc")
 	req.Header.Set("Content-Type", "application/json")
 
