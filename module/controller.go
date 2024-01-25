@@ -1065,14 +1065,14 @@ func GetPesananFromID(_id primitive.ObjectID, db *mongo.Database) (doc model.Pes
 }
 
 //sendwhatsapp
-func SendWhatsAppConfirmation(username, phonenumber string) error {
+func SendWhatsAppConfirmation(namalengkap, nomorhp string) error {
 	url := "https://api.wa.my.id/api/send/message/text"
 
 	// Data yang akan dikirimkan dalam format JSON
 	jsonStr := []byte(`{
-        "to": "` + phonenumber + `",
+        "to": "` + nomorhp + `",
         "isgroup": false,
-        "messages": "Hello ` + username + `!!! ˗ˏˋ ♡ ˎˊ˗\nTerima kasih telah melakukan Registrasi akun di HealHeroo, silakan login atau tekan link dibawah ini untuk melanjutkan.\n⬇ ⬇ ⬇ ⬇ ⬇ \nhttps://healhero.my.id/signin.html"
+        "messages": "Hello ` + namalengkap + `!!! ˗ˏˋ ♡ ˎˊ˗\nTerima kasih telah melakukan Registrasi akun di HealHeroo, silakan login atau tekan link dibawah ini untuk melanjutkan.\n⬇ ⬇ ⬇ ⬇ ⬇ \nhttps://healhero.my.id/signin.html"
     }`)
 
 	// Membuat permintaan HTTP POST
