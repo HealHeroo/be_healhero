@@ -145,7 +145,7 @@ func SignUpPengguna(db *mongo.Database, insertedDoc model.Pengguna) error {
 	return nil
 }
 
-func ValidatePhoneNumber(phoneNumber string) (bool, error) {
+func ValidatePhoneNumber(nomorhp string) (bool, error) {
 	// Define the regular expression pattern for numeric characters
 	numericPattern := `^[0-9]+$`
 
@@ -155,7 +155,7 @@ func ValidatePhoneNumber(phoneNumber string) (bool, error) {
 		return false, err
 	}
 	// Check if the phone number consists only of numeric characters
-	if !numericRegexp.MatchString(phoneNumber) {
+	if !numericRegexp.MatchString(nomorhp) {
 		return false, nil
 	}
 
@@ -169,7 +169,7 @@ func ValidatePhoneNumber(phoneNumber string) (bool, error) {
 	}
 
 	// Test if the phone number matches the pattern
-	isValid := regexpPattern.MatchString(phoneNumber)
+	isValid := regexpPattern.MatchString(nomorhp)
 
 	return isValid, nil
 }
