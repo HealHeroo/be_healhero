@@ -1072,7 +1072,8 @@ func SendWhatsAppConfirmation(namalengkap, nomorhp string) error {
 	jsonStr := []byte(`{
         "to": "` + nomorhp + `",
         "isgroup": false,
-        "messages": "Hello ` + namalengkap + `!!! ˗ˏˋ ♡ ˎˊ˗\nTerima kasih telah melakukan Registrasi akun di HealHeroo, silakan login atau tekan link dibawah ini untuk melanjutkan.\n⬇ ⬇ ⬇ ⬇ ⬇ \nhttps://healhero.my.id/signin.html"
+        "messages": "Hello ` + namalengkap + `!!! ˗ˏˋ ♡ ˎˊ˗\nTerima kasih telah melakukan Registrasi akun di HealHeroo, 🌟 Selamat datang di HealHeroo! Terima kasih telah memilih kami untuk perjalanan kesehatanmu. Jangan ragu untuk menjelajahi fitur-fitur yang kami sediakan dan temukan kemudahan dalam menjaga kesehatanmu. Semoga pengalamanmu bersama kami penuh kebahagiaan dan kesuksesan! ✨🌈"
+		
     }`)
 
 	// Membuat permintaan HTTP POST
